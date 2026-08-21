@@ -1,6 +1,10 @@
+import { useState } from "react";
+
 function App() {
+  const [amount, setAmount] = useState("");
+
   function handleExpenseClick() {
-    alert("ボタンが押されたよ！");
+    alert(`${amount}円を入力しました！`);
   }
   return (
     <main>
@@ -9,9 +13,14 @@ function App() {
 
       <label>
         金額
-        <input type="number" placeholder="例：1000" />
+        <input
+          type="number"
+          placeholder="例：1000"
+          value={amount}
+          onChange={(event) => setAmount(event.target.value)}
+        />
       </label>
-      
+
       <button onClick={handleExpenseClick}>
         支出を入力する
       </button>
