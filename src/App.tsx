@@ -2,6 +2,7 @@ import { useState } from "react";
 
 function App() {
   const [amount, setAmount] = useState("");
+  const [memo, setMemo] = useState("");
   const [expenses, setExpenses] = useState<string[]>([]);
   const total = expenses.reduce(
     (sum, expense) => sum + Number(expense),
@@ -16,6 +17,7 @@ function App() {
     setExpenses([...expenses, amount]);
     alert(`${amount}円を入力しました！`);
     setAmount("");
+    setMemo("");
   }
   return (
     <main>
@@ -29,6 +31,16 @@ function App() {
           placeholder="例：1000"
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
+        />
+      </label>
+      
+      <label>
+        メモ
+        <input
+          type="text"
+          placeholder="例：昼ごはん"
+          value={memo}
+          onChange={(event) => setMemo(event.target.value)}
         />
       </label>
 
