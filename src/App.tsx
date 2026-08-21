@@ -1,11 +1,16 @@
 import { useState } from "react";
 
+type Expense = {
+  amount: string;
+  memo: string;
+};
+
 function App() {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
-  const [expenses, setExpenses] = useState<string[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const total = expenses.reduce(
-    (sum, expense) => sum + Number(expense),
+    (sum, expense) => sum + Number(expense.amount),
     0,
   );
   function handleExpenseClick() {
@@ -14,7 +19,7 @@ function App() {
       return;
     }
 
-    setExpenses([...expenses, amount]);
+    setExpenses([...expenses, { amount, memo }]);
     alert(`${amount}円を入力しました！`);
     setAmount("");
     setMemo("");
@@ -33,7 +38,7 @@ function App() {
           onChange={(event) => setAmount(event.target.value)}
         />
       </label>
-      
+
       <label>
         メモ
         <input
@@ -52,7 +57,9 @@ function App() {
 
       <ul>
         {expenses.map((expense, index) => (
-          <li key={index}>{expense}円</li>
+          <li key={index}>
+            {expense.amount}円：{expense.memo || "メモなし"}
+          </li>
         ))}
       </ul>
     </main>
