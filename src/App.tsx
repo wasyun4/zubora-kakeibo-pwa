@@ -1,16 +1,19 @@
 import { useState } from "react";
 
 type Expense = {
+  type: string;
   amount: string;
   memo: string;
   date: string;
 };
 
 function App() {
+  const [type, setType] = useState("expense");
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
+
   const total = expenses.reduce(
     (sum, expense) => sum + Number(expense.amount),
     0,
@@ -21,7 +24,7 @@ function App() {
       return;
     }
 
-    setExpenses([...expenses, { amount, memo, date }]);
+    setExpenses([...expenses, { type, amount, memo, date }]);
     alert(`${amount}円を入力しました！`);
     setAmount("");
     setMemo("");
@@ -31,6 +34,17 @@ function App() {
     <main>
       <h1>家計簿アプリ</h1>
       <p>ここから少しずつ作っていきます。</p>
+
+      <label>
+        種類
+        <select
+          value={type}
+          onChange={(event) => setType(event.target.value)}
+        >
+          <option value="expense">支出</option>
+          <option value="income">収入</option>
+        </select>
+      </label>
 
       <label>
         金額
@@ -70,6 +84,7 @@ function App() {
       <ul>
         {expenses.map((expense, index) => (
           <li key={index}>
+            {expense.type === "expense" ? "支出" : "収入"}：
             {expense.date || "日付なし"}：{expense.amount}円：
             {expense.memo || "メモなし"}
           </li>
