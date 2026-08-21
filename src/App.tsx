@@ -8,6 +8,11 @@ function App() {
     0,
   );
   function handleExpenseClick() {
+    if (amount === "" || Number(amount) <= 0) {
+      alert("1円以上の金額を入力してください。");
+      return;
+    }
+
     setExpenses([...expenses, amount]);
     alert(`${amount}円を入力しました！`);
     setAmount("");
