@@ -42,6 +42,13 @@ function App() {
     setMemo("");
     setDate("");
   }
+
+  function handleDeleteExpense(index: number) {
+    setExpenses(
+      expenses.filter((_, expenseIndex) => expenseIndex !== index),
+    );
+  }
+
   return (
     <main>
       <h1>家計簿アプリ</h1>
@@ -101,6 +108,10 @@ function App() {
             {expense.type === "expense" ? "支出" : "収入"}：
             {expense.date || "日付なし"}：{expense.amount}円：
             {expense.memo || "メモなし"}
+
+            <button onClick={() => handleDeleteExpense(index)}>
+              削除
+            </button>
           </li>
         ))}
       </ul>
