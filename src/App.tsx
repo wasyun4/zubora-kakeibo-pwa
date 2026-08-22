@@ -28,7 +28,7 @@ function App() {
       0,
     );
 
-    const balance = incomeTotal - expenseTotal;
+  const balance = incomeTotal - expenseTotal;
 
   function handleExpenseClick() {
     if (amount === "" || Number(amount) <= 0) {
