@@ -6,6 +6,7 @@ type Transaction = {
   amount: string;
   memo: string;
   date: string;
+  source: string;
 };
 
 function App() {
@@ -13,6 +14,8 @@ function App() {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
+  const [source, setSource] = useState("");
+
   const [expenses, setExpenses] = useState<Transaction[]>(() => {
     const savedExpenses = localStorage.getItem("expenses");
 
@@ -63,6 +66,7 @@ function App() {
         amount,
         memo,
         date,
+        source,
       },
     ]);
 
@@ -70,6 +74,7 @@ function App() {
     setAmount("");
     setMemo("");
     setDate("");
+    setSource("");
   }
 
   function handleDeleteExpense(id: string) {
@@ -123,6 +128,15 @@ function App() {
         />
       </label>
 
+      <label>
+        店舗・収入元
+        <input
+          type="text"
+          value={source}
+          onChange={(event) => setSource(event.target.value)}
+        />
+      </label>
+
       <button onClick={handleExpenseClick}>
         収支を入力する
       </button>
@@ -137,6 +151,7 @@ function App() {
             {expense.type === "expense" ? "支出" : "収入"}：
             {expense.date || "日付なし"}：{expense.amount}円：
             {expense.memo || "メモなし"}
+            {expense.source || "収支元なし"}
 
             <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
