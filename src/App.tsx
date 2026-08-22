@@ -14,10 +14,22 @@ function App() {
   const [date, setDate] = useState("");
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
-  const total = expenses.reduce(
-    (sum, expense) => sum + Number(expense.amount),
-    0,
-  );
+  const expenseTotal = expenses
+    .filter((expense) => expense.type === "expense")
+    .reduce(
+      (sum, expense) => sum + Number(expense.amount),
+      0,
+    );
+
+  const incomeTotal = expenses
+    .filter((expense) => expense.type === "income")
+    .reduce(
+      (sum, expense) => sum + Number(expense.amount),
+      0,
+    );
+
+    const balance = incomeTotal - expenseTotal;
+
   function handleExpenseClick() {
     if (amount === "" || Number(amount) <= 0) {
       alert("1円以上の金額を入力してください。");
@@ -76,10 +88,12 @@ function App() {
       </label>
 
       <button onClick={handleExpenseClick}>
-        支出を入力する
+        収支を入力する
       </button>
-      <p>支出合計：{total}円</p>
-      <h2>支出履歴</h2>
+      <p>収入合計：{incomeTotal}円</p>
+      <p>支出合計：{expenseTotal}円</p>
+      <p>残高：{balance}円</p>
+      <h2>収支履歴</h2>
 
       <ul>
         {expenses.map((expense, index) => (
