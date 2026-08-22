@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 type Transaction = {
+  id: string;
   type: string;
   amount: string;
   memo: string;
@@ -15,7 +16,14 @@ function App() {
   const [expenses, setExpenses] = useState<Transaction[]>(() => {
     const savedExpenses = localStorage.getItem("expenses");
 
-    return savedExpenses ? JSON.parse(savedExpenses) : [];
+    const parsedExpenses = savedExpenses
+      ? JSON.parse(savedExpenses)
+      : [];
+
+    return parsedExpenses.map((expense: Transaction) => ({
+      ...expense,
+      id: expense.id || crypto.randomUUID(),
+    }));
   });
 
   useEffect(() => {
@@ -47,16 +55,26 @@ function App() {
       return;
     }
 
-    setExpenses([...expenses, { type, amount, memo, date }]);
+    setExpenses([
+      ...expenses,
+      {
+        id: crypto.randomUUID(),
+        type,
+        amount,
+        memo,
+        date,
+      },
+    ]);
+
     alert(`${amount}円を入力しました！`);
     setAmount("");
     setMemo("");
     setDate("");
   }
 
-  function handleDeleteExpense(index: number) {
+  function handleDeleteExpense(id: string) {
     setExpenses(
-      expenses.filter((_, expenseIndex) => expenseIndex !== index),
+      expenses.filter((expense) => expense.id !== id),
     );
   }
 
@@ -114,13 +132,13 @@ function App() {
       <h2>収支履歴</h2>
 
       <ul>
-        {expenses.map((expense, index) => (
-          <li key={index}>
+        {expenses.map((expense) => (
+          <li key={expense.id}>
             {expense.type === "expense" ? "支出" : "収入"}：
             {expense.date || "日付なし"}：{expense.amount}円：
             {expense.memo || "メモなし"}
 
-            <button onClick={() => handleDeleteExpense(index)}>
+            <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
             </button>
           </li>
