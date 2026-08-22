@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Expense = {
   type: string;
@@ -12,7 +12,18 @@ function App() {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>(() => {
+    const savedExpenses = localStorage.getItem("expenses");
+
+    return savedExpenses ? JSON.parse(savedExpenses) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "expenses",
+      JSON.stringify(expenses),
+    );
+  }, [expenses]);
 
   const expenseTotal = expenses
     .filter((expense) => expense.type === "expense")
