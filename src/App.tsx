@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type Expense = {
+type Transaction = {
   type: string;
   amount: string;
   memo: string;
@@ -12,7 +12,7 @@ function App() {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
-  const [expenses, setExpenses] = useState<Expense[]>(() => {
+  const [expenses, setExpenses] = useState<Transaction[]>(() => {
     const savedExpenses = localStorage.getItem("expenses");
 
     return savedExpenses ? JSON.parse(savedExpenses) : [];

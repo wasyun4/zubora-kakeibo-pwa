@@ -87,7 +87,7 @@ Phase 6  予算・分析・使いやすさ改善
 
 ### 次に実装
 
-- [ ] `Expense`を`Transaction`へ名称変更
+- [x] `Expense`を`Transaction`へ名称変更
 - [ ] 収支へIDを追加
 - [ ] 削除処理をID方式へ変更
 - [ ] 店舗名・収入元を追加
