@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { initialCategories } from "./categories";
 
 type Transaction = {
   id: string;
@@ -7,10 +8,18 @@ type Transaction = {
   memo: string;
   date: string;
   source: string;
+  majorCategoryId: string;
 };
 
 function App() {
+  const incomeCategories = initialCategories.filter(
+    (category) =>
+      category.type === "income" &&
+      category.parentId === null &&
+      category.isActive,
+  );
   const [type, setType] = useState("expense");
+  const [majorCategoryId, setMajorCategoryId] = useState("");
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
@@ -58,6 +67,11 @@ function App() {
       return;
     }
 
+    if (type === "income" && majorCategoryId === "") {
+      alert("収入カテゴリを選択してください。");
+      return;
+    }
+
     setExpenses([
       ...expenses,
       {
@@ -67,6 +81,7 @@ function App() {
         memo,
         date,
         source,
+        majorCategoryId,
       },
     ]);
 
@@ -75,6 +90,7 @@ function App() {
     setMemo("");
     setDate("");
     setSource("");
+    setMajorCategoryId("");
   }
 
   function handleDeleteExpense(id: string) {
@@ -83,8 +99,16 @@ function App() {
     );
   }
 
+  function getCategoryName(categoryId: string) {
+    const category = initialCategories.find(
+      (item) => item.id === categoryId,
+    );
+
+    return category?.name || "カテゴリなし";
+  }
+
   return (
-    <main>
+    <main >
       <h1>家計簿アプリ</h1>
       <p>ここから少しずつ作っていきます。</p>
 
@@ -92,12 +116,37 @@ function App() {
         種類
         <select
           value={type}
-          onChange={(event) => setType(event.target.value)}
+          onChange={(event) => {
+            setType(event.target.value);
+            setMajorCategoryId("");
+          }}
         >
           <option value="expense">支出</option>
           <option value="income">収入</option>
         </select>
       </label>
+
+      {
+        type === "income" && (
+          <label>
+            収入カテゴリ
+            <select
+              value={majorCategoryId}
+              onChange={(event) =>
+                setMajorCategoryId(event.target.value)
+              }
+            >
+              <option value="">選択してください</option>
+
+              {incomeCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )
+      }
 
       <label>
         金額
@@ -152,6 +201,7 @@ function App() {
             {expense.date || "日付なし"}：{expense.amount}円：
             {expense.memo || "メモなし"}
             {expense.source || "収支元なし"}
+            ：{getCategoryName(expense.majorCategoryId)}
 
             <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
@@ -159,7 +209,7 @@ function App() {
           </li>
         ))}
       </ul>
-    </main>
+    </main >
   );
 }
 
