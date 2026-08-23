@@ -9,6 +9,7 @@ type Transaction = {
   date: string;
   source: string;
   majorCategoryId: string;
+  minorCategoryId: string;
 };
 
 function App() {
@@ -88,6 +89,14 @@ function App() {
       return;
     }
 
+    if (
+      type === "expense" &&
+      (majorCategoryId === "" || minorCategoryId === "")
+    ) {
+      alert("支出の大カテゴリと小カテゴリを選択してください。");
+      return;
+    }
+
     setExpenses([
       ...expenses,
       {
@@ -98,6 +107,7 @@ function App() {
         date,
         source,
         majorCategoryId,
+        minorCategoryId,
       },
     ]);
 
@@ -262,6 +272,8 @@ function App() {
             {expense.memo || "メモなし"}
             {expense.source || "収支元なし"}
             ：{getCategoryName(expense.majorCategoryId)}
+            {expense.type === "expense" &&
+              `：${getCategoryName(expense.minorCategoryId)}`}
 
             <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
