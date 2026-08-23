@@ -7,6 +7,8 @@ export type Category = {
 };
 
 export const initialCategories: Category[] = [
+
+    // 収入　大カテゴリ
     {
         id: "salary",
         type: "income",
@@ -35,6 +37,8 @@ export const initialCategories: Category[] = [
         parentId: null,
         isActive: true,
     },
+
+    // 支出　大カテゴリ
     {
         id: "fixedCost",
         type: "expense",
@@ -96,6 +100,124 @@ export const initialCategories: Category[] = [
         type: "expense",
         name: "貯金",
         parentId: null,
+        isActive: true,
+    },
+
+    // 固定費 小カテゴリ
+    {
+        id: "housing",
+        type: "expense",
+        name: "住居",
+        parentId: "fixedCost",
+        isActive: true,
+    },
+    {
+        id: "mobilePhone",
+        type: "expense",
+        name: "スマホ",
+        parentId: "fixedCost",
+        isActive: true,
+    },
+    {
+        id: "internet",
+        type: "expense",
+        name: "インターネット",
+        parentId: "fixedCost",
+        isActive: true,
+    },
+    {
+        id: "gas",
+        type: "expense",
+        name: "ガス",
+        parentId: "fixedCost",
+        isActive: true,
+    },
+    {
+        id: "electricity",
+        type: "expense",
+        name: "電気",
+        parentId: "fixedCost",
+        isActive: true,
+    },
+    {
+        id: "subscription",
+        type: "expense",
+        name: "サブスク",
+        parentId: "fixedCost",
+        isActive: true,
+    },
+
+    // 食費 小カテゴリ
+    {
+        id: "groceries",
+        type: "expense",
+        name: "食料品",
+        parentId: "food",
+        isActive: true,
+    },
+    {
+        id: "diningOut",
+        type: "expense",
+        name: "外食",
+        parentId: "food",
+        isActive: true,
+    },
+    {
+        id: "drinking",
+        type: "expense",
+        name: "飲酒!!!",
+        parentId: "food",
+        isActive: true,
+    },
+    {
+        id: "convenienceMeal",
+        type: "expense",
+        name: "コンビニ飯",
+        parentId: "food",
+        isActive: true,
+    },
+    {
+        id: "beverages",
+        type: "expense",
+        name: "飲料",
+        parentId: "food",
+        isActive: true,
+    },
+
+    // 日用品 小カテゴリ
+    {
+        id: "consumables",
+        type: "expense",
+        name: "消耗品",
+        parentId: "dailyNecessities",
+        isActive: true,
+    },
+    {
+        id: "hygiene",
+        type: "expense",
+        name: "衛生用品",
+        parentId: "dailyNecessities",
+        isActive: true,
+    },
+    {
+        id: "clothing",
+        type: "expense",
+        name: "衣類",
+        parentId: "dailyNecessities",
+        isActive: true,
+    },
+    {
+        id: "tobacco",
+        type: "expense",
+        name: "ヤニ",
+        parentId: "dailyNecessities",
+        isActive: true,
+    },
+    {
+        id: "dailyNecessitiesOther",
+        type: "expense",
+        name: "その他",
+        parentId: "dailyNecessities",
         isActive: true,
     },
 ];
