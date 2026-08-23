@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
+import { initialPaymentMethods } from "./paymentMethods";
 
 type Transaction = {
   id: string;
@@ -10,6 +11,7 @@ type Transaction = {
   source: string;
   majorCategoryId: string;
   minorCategoryId: string;
+  paymentMethodId: string;
 };
 
 function App() {
@@ -33,6 +35,7 @@ function App() {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
+  const [paymentMethodId, setPaymentMethodId] = useState("");
   const [source, setSource] = useState("");
 
   const expenseMinorCategories = initialCategories.filter(
@@ -84,6 +87,11 @@ function App() {
       return;
     }
 
+    if (paymentMethodId === "") {
+      alert("支払方法を選択してください。");
+      return;
+    }
+
     if (type === "income" && majorCategoryId === "") {
       alert("収入カテゴリを選択してください。");
       return;
@@ -108,6 +116,7 @@ function App() {
         source,
         majorCategoryId,
         minorCategoryId,
+        paymentMethodId,
       },
     ]);
 
@@ -118,6 +127,7 @@ function App() {
     setSource("");
     setMajorCategoryId("");
     setMinorCategoryId("");
+    setPaymentMethodId("");
   }
 
   function handleDeleteExpense(id: string) {
@@ -130,12 +140,19 @@ function App() {
     const category = initialCategories.find(
       (item) => item.id === categoryId,
     );
-
     return category?.name || "カテゴリなし";
   }
 
+  function getPaymentMethodName(paymentMethodId: string) {
+    const paymentMethod = initialPaymentMethods.find(
+      (item) => item.id === paymentMethodId,
+    );
+
+    return paymentMethod?.name || "支払方法なし";
+  }
+
   return (
-    <main >
+    <main>
       <h1>家計簿アプリ</h1>
       <p>ここから少しずつ作っていきます。</p>
 
@@ -256,6 +273,29 @@ function App() {
         />
       </label>
 
+      <label>
+        支払方法
+        <select
+          value={paymentMethodId}
+          onChange={(event) =>
+            setPaymentMethodId(event.target.value)
+          }
+        >
+          <option value="">選択してください</option>
+
+          {initialPaymentMethods
+            .filter((paymentMethod) => paymentMethod.isActive)
+            .map((paymentMethod) => (
+              <option
+                key={paymentMethod.id}
+                value={paymentMethod.id}
+              >
+                {paymentMethod.name}
+              </option>
+            ))}
+        </select>
+      </label>
+
       <button onClick={handleExpenseClick}>
         収支を入力する
       </button>
@@ -274,6 +314,7 @@ function App() {
             ：{getCategoryName(expense.majorCategoryId)}
             {expense.type === "expense" &&
               `：${getCategoryName(expense.minorCategoryId)}`}
+            ：{getPaymentMethodName(expense.paymentMethodId)}
 
             <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
