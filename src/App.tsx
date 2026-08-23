@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
 
+type TransactionScope = "personal" | "shared";
+
 type Transaction = {
   id: string;
   type: string;
@@ -12,6 +14,7 @@ type Transaction = {
   majorCategoryId: string;
   minorCategoryId: string;
   paymentMethodId: string;
+  scope: TransactionScope;
 };
 
 function App() {
@@ -36,6 +39,9 @@ function App() {
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
   const [paymentMethodId, setPaymentMethodId] = useState("");
+  const [scope, setScope] =
+    useState<TransactionScope>("personal");
+
   const [source, setSource] = useState("");
 
   const expenseMinorCategories = initialCategories.filter(
@@ -117,6 +123,7 @@ function App() {
         majorCategoryId,
         minorCategoryId,
         paymentMethodId,
+        scope,
       },
     ]);
 
@@ -128,6 +135,7 @@ function App() {
     setMajorCategoryId("");
     setMinorCategoryId("");
     setPaymentMethodId("");
+    setScope("personal");
   }
 
   function handleDeleteExpense(id: string) {
@@ -296,6 +304,19 @@ function App() {
         </select>
       </label>
 
+      <label>
+        個人・共有
+        <select
+          value={scope}
+          onChange={(event) =>
+            setScope(event.target.value as TransactionScope)
+          }
+        >
+          <option value="personal">個人</option>
+          <option value="shared">共有</option>
+        </select>
+      </label>
+
       <button onClick={handleExpenseClick}>
         収支を入力する
       </button>
@@ -315,6 +336,7 @@ function App() {
             {expense.type === "expense" &&
               `：${getCategoryName(expense.minorCategoryId)}`}
             ：{getPaymentMethodName(expense.paymentMethodId)}
+            ：{expense.scope === "shared" ? "共有" : "個人"}
 
             <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
