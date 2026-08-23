@@ -18,12 +18,28 @@ function App() {
       category.parentId === null &&
       category.isActive,
   );
+
+  const expenseMajorCategories = initialCategories.filter(
+    (category) =>
+      category.type === "expense" &&
+      category.parentId === null &&
+      category.isActive,
+  );
+
   const [type, setType] = useState("expense");
   const [majorCategoryId, setMajorCategoryId] = useState("");
+  const [minorCategoryId, setMinorCategoryId] = useState("");
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState("");
   const [source, setSource] = useState("");
+
+  const expenseMinorCategories = initialCategories.filter(
+    (category) =>
+      category.type === "expense" &&
+      category.parentId === majorCategoryId &&
+      category.isActive,
+  );
 
   const [expenses, setExpenses] = useState<Transaction[]>(() => {
     const savedExpenses = localStorage.getItem("expenses");
@@ -91,6 +107,7 @@ function App() {
     setDate("");
     setSource("");
     setMajorCategoryId("");
+    setMinorCategoryId("");
   }
 
   function handleDeleteExpense(id: string) {
@@ -119,6 +136,7 @@ function App() {
           onChange={(event) => {
             setType(event.target.value);
             setMajorCategoryId("");
+            setMinorCategoryId("");
           }}
         >
           <option value="expense">支出</option>
@@ -132,9 +150,10 @@ function App() {
             収入カテゴリ
             <select
               value={majorCategoryId}
-              onChange={(event) =>
-                setMajorCategoryId(event.target.value)
-              }
+              onChange={(event) => {
+                setMajorCategoryId(event.target.value);
+                setMinorCategoryId("");
+              }}
             >
               <option value="">選択してください</option>
 
@@ -147,6 +166,47 @@ function App() {
           </label>
         )
       }
+
+      {type === "expense" && (
+        <label>
+          支出の大カテゴリ
+          <select
+            value={majorCategoryId}
+            onChange={(event) => {
+              setMajorCategoryId(event.target.value);
+              setMinorCategoryId("");
+            }}
+          >
+            <option value="">選択してください</option>
+
+            {expenseMajorCategories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {type === "expense" && majorCategoryId !== "" && (
+        <label>
+          支出の小カテゴリ
+          <select
+            value={minorCategoryId}
+            onChange={(event) =>
+              setMinorCategoryId(event.target.value)
+            }
+          >
+            <option value="">選択してください</option>
+
+            {expenseMinorCategories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <label>
         金額
