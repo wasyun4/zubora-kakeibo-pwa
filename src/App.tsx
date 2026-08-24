@@ -94,6 +94,27 @@ function App() {
       0,
     );
 
+  const expenseCategoryTotals = expenseMajorCategories
+    .map((category) => {
+      const total = filteredExpenses
+        .filter(
+          (expense) =>
+            expense.type === "expense" &&
+            expense.majorCategoryId === category.id,
+        )
+        .reduce(
+          (sum, expense) => sum + Number(expense.amount),
+          0,
+        );
+
+      return {
+        id: category.id,
+        name: category.name,
+        total,
+      };
+    })
+    .filter((category) => category.total > 0);
+
   const balance = incomeTotal - expenseTotal;
 
   function resetForm() {
@@ -395,6 +416,17 @@ function App() {
       <p>収入合計：{incomeTotal}円</p>
       <p>支出合計：{expenseTotal}円</p>
       <p>残高：{balance}円</p>
+
+      <h2>カテゴリ別支出</h2>
+
+      <ul>
+        {expenseCategoryTotals.map((category) => (
+          <li key={category.id}>
+            {category.name}：{category.total}円
+          </li>
+        ))}
+      </ul>
+
       <h2>収支履歴</h2>
 
       <ul>
