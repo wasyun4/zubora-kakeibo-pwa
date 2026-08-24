@@ -41,6 +41,8 @@ function App() {
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [scope, setScope] =
     useState<TransactionScope>("personal");
+  const [editingTransactionId, setEditingTransactionId] =
+    useState<string | null>(null);
 
   const [source, setSource] = useState("");
 
@@ -87,6 +89,18 @@ function App() {
 
   const balance = incomeTotal - expenseTotal;
 
+  function resetForm() {
+    setAmount("");
+    setMemo("");
+    setDate("");
+    setSource("");
+    setMajorCategoryId("");
+    setMinorCategoryId("");
+    setPaymentMethodId("");
+    setScope("personal");
+    setEditingTransactionId(null);
+  }
+
   function handleExpenseClick() {
     if (amount === "" || Number(amount) <= 0) {
       alert("1円以上の金額を入力してください。");
@@ -111,37 +125,68 @@ function App() {
       return;
     }
 
-    setExpenses([
-      ...expenses,
-      {
-        id: crypto.randomUUID(),
-        type,
-        amount,
-        memo,
-        date,
-        source,
-        majorCategoryId,
-        minorCategoryId,
-        paymentMethodId,
-        scope,
-      },
-    ]);
+    const transactionData = {
+      type,
+      amount,
+      memo,
+      date,
+      source,
+      majorCategoryId,
+      minorCategoryId,
+      paymentMethodId,
+      scope,
+    };
 
-    alert(`${amount}円を入力しました！`);
-    setAmount("");
-    setMemo("");
-    setDate("");
-    setSource("");
-    setMajorCategoryId("");
-    setMinorCategoryId("");
-    setPaymentMethodId("");
-    setScope("personal");
+    if (editingTransactionId === null) {
+      setExpenses([
+        ...expenses,
+        {
+          id: crypto.randomUUID(),
+          ...transactionData,
+        },
+      ]);
+
+      alert(`${amount}円を入力しました！`);
+    } else {
+      setExpenses(
+        expenses.map((expense) =>
+          expense.id === editingTransactionId
+            ? { ...expense, ...transactionData }
+            : expense,
+        ),
+      );
+
+      alert(`${amount}円に更新しました！`);
+    }
+
+    resetForm();
   }
 
   function handleDeleteExpense(id: string) {
     setExpenses(
       expenses.filter((expense) => expense.id !== id),
     );
+  }
+
+  function handleEditTransaction(id: string) {
+    const transaction = expenses.find(
+      (expense) => expense.id === id,
+    );
+
+    if (!transaction) {
+      return;
+    }
+
+    setType(transaction.type);
+    setAmount(transaction.amount);
+    setMemo(transaction.memo);
+    setDate(transaction.date);
+    setSource(transaction.source);
+    setMajorCategoryId(transaction.majorCategoryId || "");
+    setMinorCategoryId(transaction.minorCategoryId || "");
+    setPaymentMethodId(transaction.paymentMethodId || "");
+    setScope(transaction.scope || "personal");
+    setEditingTransactionId(transaction.id);
   }
 
   function getCategoryName(categoryId: string) {
@@ -318,8 +363,17 @@ function App() {
       </label>
 
       <button onClick={handleExpenseClick}>
-        収支を入力する
+        {editingTransactionId === null
+          ? "収支を入力する"
+          : "収支を更新する"}
       </button>
+
+      {editingTransactionId !== null && (
+        <button type="button" onClick={resetForm}>
+          編集をやめる
+        </button>
+      )}
+
       <p>収入合計：{incomeTotal}円</p>
       <p>支出合計：{expenseTotal}円</p>
       <p>残高：{balance}円</p>
@@ -337,6 +391,12 @@ function App() {
               `：${getCategoryName(expense.minorCategoryId)}`}
             ：{getPaymentMethodName(expense.paymentMethodId)}
             ：{expense.scope === "shared" ? "共有" : "個人"}
+
+            <button
+              onClick={() => handleEditTransaction(expense.id)}
+            >
+              編集
+            </button>
 
             <button onClick={() => handleDeleteExpense(expense.id)}>
               削除
