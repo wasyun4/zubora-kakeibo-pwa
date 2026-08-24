@@ -5,6 +5,7 @@ import type {
   Transaction,
   TransactionScope,
 } from "./types";
+import Summary from "./components/Summary";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -419,10 +420,12 @@ function App() {
         />
       </label>
 
-      <p>収入合計：{incomeTotal}円</p>
-      <p>生活支出：{expenseTotal}円</p>
-      <p>貯金：{savingsTotal}円</p>
-      <p>使える残り：{availableBalance}円</p>
+      <Summary
+        incomeTotal={incomeTotal}
+        expenseTotal={expenseTotal}
+        savingsTotal={savingsTotal}
+        availableBalance={availableBalance}
+      />
 
       <h2>カテゴリ別支出</h2>
 
