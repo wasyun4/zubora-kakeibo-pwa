@@ -43,7 +43,7 @@ function App() {
     useState<TransactionScope>("personal");
   const [editingTransactionId, setEditingTransactionId] =
     useState<string | null>(null);
-
+  const [selectedMonth, setSelectedMonth] = useState("");
   const [source, setSource] = useState("");
 
   const expenseMinorCategories = initialCategories.filter(
@@ -73,14 +73,21 @@ function App() {
     );
   }, [expenses]);
 
-  const expenseTotal = expenses
+  const filteredExpenses =
+    selectedMonth === ""
+      ? expenses
+      : expenses.filter((expense) =>
+        expense.date.startsWith(selectedMonth),
+      );
+
+  const expenseTotal = filteredExpenses
     .filter((expense) => expense.type === "expense")
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
     );
 
-  const incomeTotal = expenses
+  const incomeTotal = filteredExpenses
     .filter((expense) => expense.type === "income")
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
@@ -374,13 +381,24 @@ function App() {
         </button>
       )}
 
+      <label>
+        表示する月
+        <input
+          type="month"
+          value={selectedMonth}
+          onChange={(event) =>
+            setSelectedMonth(event.target.value)
+          }
+        />
+      </label>
+
       <p>収入合計：{incomeTotal}円</p>
       <p>支出合計：{expenseTotal}円</p>
       <p>残高：{balance}円</p>
       <h2>収支履歴</h2>
 
       <ul>
-        {expenses.map((expense) => (
+        {filteredExpenses.map((expense) => (
           <li key={expense.id}>
             {expense.type === "expense" ? "支出" : "収入"}：
             {expense.date || "日付なし"}：{expense.amount}円：
