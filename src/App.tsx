@@ -6,6 +6,7 @@ import type {
   TransactionScope,
 } from "./types";
 import Summary from "./components/Summary";
+import CategoryTotals from "./components/CategoryTotals";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -427,15 +428,7 @@ function App() {
         availableBalance={availableBalance}
       />
 
-      <h2>カテゴリ別支出</h2>
-
-      <ul>
-        {expenseCategoryTotals.map((category) => (
-          <li key={category.id}>
-            {category.name}：{category.total}円
-          </li>
-        ))}
-      </ul>
+      <CategoryTotals categoryTotals={expenseCategoryTotals} />
 
       <h2>収支履歴</h2>
 
