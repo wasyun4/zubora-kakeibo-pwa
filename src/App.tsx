@@ -1,21 +1,10 @@
 import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
-
-type TransactionScope = "personal" | "shared";
-
-type Transaction = {
-  id: string;
-  type: string;
-  amount: string;
-  memo: string;
-  date: string;
-  source: string;
-  majorCategoryId: string;
-  minorCategoryId: string;
-  paymentMethodId: string;
-  scope: TransactionScope;
-};
+import type {
+  Transaction,
+  TransactionScope,
+} from "./types";
 
 function App() {
   const incomeCategories = initialCategories.filter(
