@@ -81,7 +81,22 @@ function App() {
       );
 
   const expenseTotal = filteredExpenses
-    .filter((expense) => expense.type === "expense")
+    .filter(
+      (expense) =>
+        expense.type === "expense" &&
+        expense.majorCategoryId !== "savings",
+    )
+    .reduce(
+      (sum, expense) => sum + Number(expense.amount),
+      0,
+    );
+
+  const savingsTotal = filteredExpenses
+    .filter(
+      (expense) =>
+        expense.type === "expense" &&
+        expense.majorCategoryId === "savings",
+    )
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
@@ -95,6 +110,7 @@ function App() {
     );
 
   const expenseCategoryTotals = expenseMajorCategories
+    .filter((category) => category.id !== "savings")
     .map((category) => {
       const total = filteredExpenses
         .filter(
@@ -115,7 +131,8 @@ function App() {
     })
     .filter((category) => category.total > 0);
 
-  const balance = incomeTotal - expenseTotal;
+  const availableBalance =
+    incomeTotal - expenseTotal - savingsTotal;
 
   function resetForm() {
     setAmount("");
@@ -414,8 +431,9 @@ function App() {
       </label>
 
       <p>収入合計：{incomeTotal}円</p>
-      <p>支出合計：{expenseTotal}円</p>
-      <p>残高：{balance}円</p>
+      <p>生活支出：{expenseTotal}円</p>
+      <p>貯金：{savingsTotal}円</p>
+      <p>使える残り：{availableBalance}円</p>
 
       <h2>カテゴリ別支出</h2>
 
