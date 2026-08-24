@@ -7,6 +7,7 @@ import type {
 } from "./types";
 import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
+import MonthFilter from "./components/MonthFilter";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -410,16 +411,10 @@ function App() {
         </button>
       )}
 
-      <label>
-        表示する月
-        <input
-          type="month"
-          value={selectedMonth}
-          onChange={(event) =>
-            setSelectedMonth(event.target.value)
-          }
-        />
-      </label>
+      <MonthFilter
+        selectedMonth={selectedMonth}
+        onMonthChange={setSelectedMonth}
+      />
 
       <Summary
         incomeTotal={incomeTotal}
