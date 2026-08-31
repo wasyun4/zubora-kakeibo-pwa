@@ -8,6 +8,7 @@ import type {
 import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
 import MonthFilter from "./components/MonthFilter";
+import TransactionList from "./components/TransactionList";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -226,21 +227,6 @@ function App() {
     setEditingTransactionId(transaction.id);
   }
 
-  function getCategoryName(categoryId: string) {
-    const category = initialCategories.find(
-      (item) => item.id === categoryId,
-    );
-    return category?.name || "カテゴリなし";
-  }
-
-  function getPaymentMethodName(paymentMethodId: string) {
-    const paymentMethod = initialPaymentMethods.find(
-      (item) => item.id === paymentMethodId,
-    );
-
-    return paymentMethod?.name || "支払方法なし";
-  }
-
   return (
     <main>
       <h1>家計簿アプリ</h1>
@@ -425,34 +411,12 @@ function App() {
 
       <CategoryTotals categoryTotals={expenseCategoryTotals} />
 
-      <h2>収支履歴</h2>
-
-      <ul>
-        {filteredExpenses.map((expense) => (
-          <li key={expense.id}>
-            {expense.type === "expense" ? "支出" : "収入"}：
-            {expense.date || "日付なし"}：{expense.amount}円：
-            {expense.memo || "メモなし"}
-            {expense.source || "収支元なし"}
-            ：{getCategoryName(expense.majorCategoryId)}
-            {expense.type === "expense" &&
-              `：${getCategoryName(expense.minorCategoryId)}`}
-            ：{getPaymentMethodName(expense.paymentMethodId)}
-            ：{expense.scope === "shared" ? "共有" : "個人"}
-
-            <button
-              onClick={() => handleEditTransaction(expense.id)}
-            >
-              編集
-            </button>
-
-            <button onClick={() => handleDeleteExpense(expense.id)}>
-              削除
-            </button>
-          </li>
-        ))}
-      </ul>
-    </main >
+      <TransactionList
+        transactions={filteredExpenses}
+        onEdit={handleEditTransaction}
+        onDelete={handleDeleteExpense}
+      />
+    </main>
   );
 }
 
