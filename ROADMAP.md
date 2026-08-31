@@ -113,8 +113,8 @@ Phase 6  分析・高度な使いやすさ改善
 - [x] カテゴリ別集計を`CategoryTotals.tsx`へ分離
 - [x] 月選択を`MonthFilter.tsx`へ分離
 - [x] 履歴一覧を`TransactionList.tsx`へ分離
-- [ ] 入力欄を`TransactionForm.tsx`へ分離
-- [ ] 画面部品の分離を完了
+- [x] 入力欄を`TransactionForm.tsx`へ分離
+- [x] 画面部品の分離を完了
 - [ ] 月全体の生活費予算
 - [ ] 基本的な見た目とスマホ表示を整える
 - [ ] カテゴリ別予算
@@ -134,7 +134,7 @@ Phase 6  分析・高度な使いやすさ改善
 
 ## 現在地
 
-Phase 1は完了しました。現在はPhase 1.5の画面部品分離を進めており、次は入力欄を`TransactionForm.tsx`へ分離します。
+Phase 1は完了し、Phase 1.5のデータ型・画面部品の分離も完了しました。次は月全体の生活費予算を追加します。
 
 現在の保存先は`localStorage`です。これは試作用であり、正式版ではIndexedDBへ移行します。
 

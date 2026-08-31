@@ -9,6 +9,7 @@ import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
 import MonthFilter from "./components/MonthFilter";
 import TransactionList from "./components/TransactionList";
+import TransactionForm from "./components/TransactionForm";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -232,170 +233,41 @@ function App() {
       <h1>家計簿アプリ</h1>
       <p>ここから少しずつ作っていきます。</p>
 
-      <label>
-        種類
-        <select
-          value={type}
-          onChange={(event) => {
-            setType(event.target.value);
-            setMajorCategoryId("");
-            setMinorCategoryId("");
-          }}
-        >
-          <option value="expense">支出</option>
-          <option value="income">収入</option>
-        </select>
-      </label>
+      <TransactionForm
+        type={type}
+        majorCategoryId={majorCategoryId}
+        minorCategoryId={minorCategoryId}
+        amount={amount}
+        memo={memo}
+        date={date}
+        source={source}
+        paymentMethodId={paymentMethodId}
+        scope={scope}
+        editingTransactionId={editingTransactionId}
+        incomeCategories={incomeCategories}
+        expenseMajorCategories={expenseMajorCategories}
+        expenseMinorCategories={expenseMinorCategories}
+        paymentMethods={initialPaymentMethods}
+        onTypeChange={(value) => {
+          setType(value);
+          setMajorCategoryId("");
+          setMinorCategoryId("");
+        }}
+        onMajorCategoryChange={(value) => {
+          setMajorCategoryId(value);
+          setMinorCategoryId("");
+        }}
+        onMinorCategoryChange={setMinorCategoryId}
+        onAmountChange={setAmount}
+        onMemoChange={setMemo}
+        onDateChange={setDate}
+        onSourceChange={setSource}
+        onPaymentMethodChange={setPaymentMethodId}
+        onScopeChange={setScope}
+        onSubmit={handleExpenseClick}
+        onCancel={resetForm}
+      />
 
-      {
-        type === "income" && (
-          <label>
-            収入カテゴリ
-            <select
-              value={majorCategoryId}
-              onChange={(event) => {
-                setMajorCategoryId(event.target.value);
-                setMinorCategoryId("");
-              }}
-            >
-              <option value="">選択してください</option>
-
-              {incomeCategories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        )
-      }
-
-      {type === "expense" && (
-        <label>
-          支出の大カテゴリ
-          <select
-            value={majorCategoryId}
-            onChange={(event) => {
-              setMajorCategoryId(event.target.value);
-              setMinorCategoryId("");
-            }}
-          >
-            <option value="">選択してください</option>
-
-            {expenseMajorCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-
-      {type === "expense" && majorCategoryId !== "" && (
-        <label>
-          支出の小カテゴリ
-          <select
-            value={minorCategoryId}
-            onChange={(event) =>
-              setMinorCategoryId(event.target.value)
-            }
-          >
-            <option value="">選択してください</option>
-
-            {expenseMinorCategories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-
-      <label>
-        金額
-        <input
-          type="number"
-          placeholder="例：1000"
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-        />
-      </label>
-
-      <label>
-        メモ
-        <input
-          type="text"
-          placeholder="例：昼ごはん"
-          value={memo}
-          onChange={(event) => setMemo(event.target.value)}
-        />
-      </label>
-
-      <label>
-        日付
-        <input
-          type="date"
-          value={date}
-          onChange={(event) => setDate(event.target.value)}
-        />
-      </label>
-
-      <label>
-        店舗・収入元
-        <input
-          type="text"
-          value={source}
-          onChange={(event) => setSource(event.target.value)}
-        />
-      </label>
-
-      <label>
-        支払方法
-        <select
-          value={paymentMethodId}
-          onChange={(event) =>
-            setPaymentMethodId(event.target.value)
-          }
-        >
-          <option value="">選択してください</option>
-
-          {initialPaymentMethods
-            .filter((paymentMethod) => paymentMethod.isActive)
-            .map((paymentMethod) => (
-              <option
-                key={paymentMethod.id}
-                value={paymentMethod.id}
-              >
-                {paymentMethod.name}
-              </option>
-            ))}
-        </select>
-      </label>
-
-      <label>
-        個人・共有
-        <select
-          value={scope}
-          onChange={(event) =>
-            setScope(event.target.value as TransactionScope)
-          }
-        >
-          <option value="personal">個人</option>
-          <option value="shared">共有</option>
-        </select>
-      </label>
-
-      <button onClick={handleExpenseClick}>
-        {editingTransactionId === null
-          ? "収支を入力する"
-          : "収支を更新する"}
-      </button>
-
-      {editingTransactionId !== null && (
-        <button type="button" onClick={resetForm}>
-          編集をやめる
-        </button>
-      )}
 
       <MonthFilter
         selectedMonth={selectedMonth}
