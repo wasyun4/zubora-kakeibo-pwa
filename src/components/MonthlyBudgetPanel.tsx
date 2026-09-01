@@ -15,6 +15,14 @@ function MonthlyBudgetPanel({
     onBudgetAmountChange,
     onSave,
 }: MonthlyBudgetPanelProps) {
+
+    const usagePercentage =
+        savedBudgetAmount !== null && remainingBudget !== null
+            ? Math.round(
+                ((savedBudgetAmount - remainingBudget) / savedBudgetAmount) * 100,
+            )
+            : 0;
+
     return (
         <section>
             <h2>月の生活費予算</h2>
@@ -43,6 +51,20 @@ function MonthlyBudgetPanel({
                     ) : (
                         <>
                             <p>設定予算：{savedBudgetAmount}円</p>
+
+                            <div className="budget-heading">
+                                <span>予算の使用率</span>
+                                <strong>{usagePercentage}%</strong>
+                            </div>
+
+                            <div className="budget-progress">
+                                <div
+                                    className="budget-progress-bar"
+                                    style={{
+                                        width: `${Math.min(usagePercentage, 100)}%`,
+                                    }}
+                                />
+                            </div>
 
                             {remainingBudget >= 0 ? (
                                 <p>残り予算：{remainingBudget}円</p>
