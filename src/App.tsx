@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
 import type {
+  CategoryBudget,
   MonthlyBudget,
   Transaction,
   TransactionScope,
@@ -12,6 +13,7 @@ import MonthFilter from "./components/MonthFilter";
 import TransactionList from "./components/TransactionList";
 import TransactionForm from "./components/TransactionForm";
 import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
+import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -47,6 +49,15 @@ function App() {
         localStorage.getItem("monthlyBudgets");
 
       return savedBudgets ? JSON.parse(savedBudgets) : [];
+    });
+  const [categoryBudgets, setCategoryBudgets] =
+    useState<CategoryBudget[]>(() => {
+      const savedCategoryBudgets =
+        localStorage.getItem("categoryBudgets");
+
+      return savedCategoryBudgets
+        ? JSON.parse(savedCategoryBudgets)
+        : [];
     });
   const [source, setSource] = useState("");
 
@@ -93,6 +104,13 @@ function App() {
       savedBudget ? String(savedBudget.amount) : "",
     );
   }, [selectedMonth, monthlyBudgets]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "categoryBudgets",
+      JSON.stringify(categoryBudgets),
+    );
+  }, [categoryBudgets]);
 
   const filteredExpenses =
     selectedMonth === ""
@@ -152,6 +170,28 @@ function App() {
     })
     .filter((category) => category.total > 0);
 
+  const categoryBudgetStatuses = categoryBudgets
+    .filter((budget) => budget.month === selectedMonth)
+    .map((budget) => {
+      const category = expenseMajorCategories.find(
+        (item) => item.id === budget.majorCategoryId,
+      );
+
+      const categoryTotal = expenseCategoryTotals.find(
+        (item) => item.id === budget.majorCategoryId,
+      );
+
+      const spent = categoryTotal?.total ?? 0;
+
+      return {
+        id: budget.majorCategoryId,
+        name: category?.name ?? "カテゴリなし",
+        budget: budget.amount,
+        spent,
+        remaining: budget.amount - spent,
+      };
+    });
+
   const availableBalance =
     incomeTotal - expenseTotal - savingsTotal;
 
@@ -195,6 +235,36 @@ function App() {
     );
 
     alert(`${selectedMonth}の予算を保存しました！`);
+  }
+
+  function handleSaveCategoryBudget(
+    majorCategoryId: string,
+    amount: number,
+  ) {
+    const newBudget: CategoryBudget = {
+      month: selectedMonth,
+      majorCategoryId,
+      amount,
+    };
+
+    const alreadyExists = categoryBudgets.some(
+      (budget) =>
+        budget.month === selectedMonth &&
+        budget.majorCategoryId === majorCategoryId,
+    );
+
+    setCategoryBudgets(
+      alreadyExists
+        ? categoryBudgets.map((budget) =>
+          budget.month === selectedMonth &&
+            budget.majorCategoryId === majorCategoryId
+            ? newBudget
+            : budget,
+        )
+        : [...categoryBudgets, newBudget],
+    );
+
+    alert("カテゴリ予算を保存しました！");
   }
 
   function resetForm() {
@@ -350,6 +420,15 @@ function App() {
         remainingBudget={remainingBudget}
         onBudgetAmountChange={setBudgetAmount}
         onSave={handleSaveBudget}
+      />
+
+      <CategoryBudgetPanel
+        selectedMonth={selectedMonth}
+        categories={expenseMajorCategories.filter(
+          (category) => category.id !== "savings",
+        )}
+        statuses={categoryBudgetStatuses}
+        onSave={handleSaveCategoryBudget}
       />
 
       <Summary

@@ -17,3 +17,9 @@ export type MonthlyBudget = {
   month: string;
   amount: number;
 };
+
+export type CategoryBudget = {
+  month: string;
+  majorCategoryId: string;
+  amount: number;
+};
