@@ -172,3 +172,22 @@ li button {
   border-radius: inherit;
   transition: width 0.3s ease;
 }
+
+@media (max-width: 420px) {
+  main {
+    padding: 1rem 0.75rem;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-item strong {
+    overflow-wrap: anywhere;
+  }
+
+  input,
+  select {
+    font-size: 16px;
+  }
+}
