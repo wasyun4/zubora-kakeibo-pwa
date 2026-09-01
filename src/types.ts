@@ -12,3 +12,8 @@ export type Transaction = {
   paymentMethodId: string;
   scope: TransactionScope;
 };
+
+export type MonthlyBudget = {
+  month: string;
+  amount: number;
+};

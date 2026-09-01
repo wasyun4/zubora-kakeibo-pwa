@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
 import type {
+  MonthlyBudget,
   Transaction,
   TransactionScope,
 } from "./types";
@@ -10,6 +11,7 @@ import CategoryTotals from "./components/CategoryTotals";
 import MonthFilter from "./components/MonthFilter";
 import TransactionList from "./components/TransactionList";
 import TransactionForm from "./components/TransactionForm";
+import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
 
 function App() {
   const incomeCategories = initialCategories.filter(
@@ -38,6 +40,14 @@ function App() {
   const [editingTransactionId, setEditingTransactionId] =
     useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [budgetAmount, setBudgetAmount] = useState("");
+  const [monthlyBudgets, setMonthlyBudgets] =
+    useState<MonthlyBudget[]>(() => {
+      const savedBudgets =
+        localStorage.getItem("monthlyBudgets");
+
+      return savedBudgets ? JSON.parse(savedBudgets) : [];
+    });
   const [source, setSource] = useState("");
 
   const expenseMinorCategories = initialCategories.filter(
@@ -66,6 +76,23 @@ function App() {
       JSON.stringify(expenses),
     );
   }, [expenses]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "monthlyBudgets",
+      JSON.stringify(monthlyBudgets),
+    );
+  }, [monthlyBudgets]);
+
+  useEffect(() => {
+    const savedBudget = monthlyBudgets.find(
+      (budget) => budget.month === selectedMonth,
+    );
+
+    setBudgetAmount(
+      savedBudget ? String(savedBudget.amount) : "",
+    );
+  }, [selectedMonth, monthlyBudgets]);
 
   const filteredExpenses =
     selectedMonth === ""
@@ -127,6 +154,48 @@ function App() {
 
   const availableBalance =
     incomeTotal - expenseTotal - savingsTotal;
+
+  const selectedBudget = monthlyBudgets.find(
+    (budget) => budget.month === selectedMonth,
+  );
+
+  const remainingBudget =
+    selectedBudget === undefined
+      ? null
+      : selectedBudget.amount - expenseTotal;
+
+  function handleSaveBudget() {
+    if (selectedMonth === "") {
+      alert("予算を設定する月を選択してください。");
+      return;
+    }
+
+    if (budgetAmount === "" || Number(budgetAmount) <= 0) {
+      alert("1円以上の予算を入力してください。");
+      return;
+    }
+
+    const newBudget: MonthlyBudget = {
+      month: selectedMonth,
+      amount: Number(budgetAmount),
+    };
+
+    const alreadyExists = monthlyBudgets.some(
+      (budget) => budget.month === selectedMonth,
+    );
+
+    setMonthlyBudgets(
+      alreadyExists
+        ? monthlyBudgets.map((budget) =>
+          budget.month === selectedMonth
+            ? newBudget
+            : budget,
+        )
+        : [...monthlyBudgets, newBudget],
+    );
+
+    alert(`${selectedMonth}の予算を保存しました！`);
+  }
 
   function resetForm() {
     setAmount("");
@@ -272,6 +341,15 @@ function App() {
       <MonthFilter
         selectedMonth={selectedMonth}
         onMonthChange={setSelectedMonth}
+      />
+
+      <MonthlyBudgetPanel
+        selectedMonth={selectedMonth}
+        budgetAmount={budgetAmount}
+        savedBudgetAmount={selectedBudget?.amount ?? null}
+        remainingBudget={remainingBudget}
+        onBudgetAmountChange={setBudgetAmount}
+        onSave={handleSaveBudget}
       />
 
       <Summary
