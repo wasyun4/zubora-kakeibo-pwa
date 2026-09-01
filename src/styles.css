@@ -114,3 +114,40 @@ li button {
 .delete-button:hover {
   background: #a92222;
 }
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  text-align: left;
+  border-left: 5px solid;
+  border-radius: 0.5rem;
+  background: #f7faf8;
+}
+
+.summary-item strong {
+  font-size: 1.25rem;
+}
+
+.income {
+  border-color: #2e7d32;
+}
+
+.expense {
+  border-color: #d32f2f;
+}
+
+.savings {
+  border-color: #1976d2;
+}
+
+.balance {
+  border-color: #f9a825;
+}

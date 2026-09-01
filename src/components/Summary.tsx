@@ -12,11 +12,26 @@ function Summary({
   availableBalance,
 }: SummaryProps) {
   return (
-    <section>
-      <p>収入合計：{incomeTotal}円</p>
-      <p>生活支出：{expenseTotal}円</p>
-      <p>貯金：{savingsTotal}円</p>
-      <p>使える残り：{availableBalance}円</p>
+    <section className="summary">
+      <div className="summary-item income">
+        <span>収入合計</span>
+        <strong>{incomeTotal}円</strong>
+      </div>
+
+      <div className="summary-item expense">
+        <span>生活支出</span>
+        <strong>{expenseTotal}円</strong>
+      </div>
+
+      <div className="summary-item savings">
+        <span>貯金</span>
+        <strong>{savingsTotal}円</strong>
+      </div>
+
+      <div className="summary-item balance">
+        <span>使える残り</span>
+        <strong>{availableBalance}円</strong>
+      </div>
     </section>
   );
 }
