@@ -93,3 +93,24 @@ li {
 li button {
   margin-top: 0.5rem;
 }
+
+.transaction-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-button {
+  background: #1976d2;
+}
+
+.edit-button:hover {
+  background: #125ca4;
+}
+
+.delete-button {
+  background: #d32f2f;
+}
+
+.delete-button:hover {
+  background: #a92222;
+}

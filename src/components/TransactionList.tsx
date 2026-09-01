@@ -55,13 +55,21 @@ function TransactionList({
                             ? "共有"
                             : "個人"}
 
-                        <button onClick={() => onEdit(transaction.id)}>
-                            編集
-                        </button>
+                        <div className="transaction-actions">
+                            <button
+                                className="edit-button"
+                                onClick={() => onEdit(transaction.id)}
+                            >
+                                編集
+                            </button>
 
-                        <button onClick={() => onDelete(transaction.id)}>
-                            削除
-                        </button>
+                            <button
+                                className="delete-button"
+                                onClick={() => onDelete(transaction.id)}
+                            >
+                                削除
+                            </button>
+                        </div>
                     </li>
                 ))}
             </ul>
