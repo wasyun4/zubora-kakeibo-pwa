@@ -46,6 +46,8 @@ function App() {
     useState<TransactionScope>("personal");
   const [editingTransactionId, setEditingTransactionId] =
     useState<string | null>(null);
+  const [isTransactionFormOpen, setIsTransactionFormOpen] =
+    useState(false);
   const [selectedMonth, setSelectedMonth] = useState("");
   // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
@@ -302,6 +304,7 @@ function App() {
     setPaymentMethodId("");
     setScope("personal");
     setEditingTransactionId(null);
+    setIsTransactionFormOpen(false);
   }
 
   // 【収支の新規登録・更新】
@@ -393,6 +396,7 @@ function App() {
     setPaymentMethodId(transaction.paymentMethodId || "");
     setScope(transaction.scope || "personal");
     setEditingTransactionId(transaction.id);
+    setIsTransactionFormOpen(true);
   }
 
   // 【画面コンポーネントの組み立て】
@@ -429,41 +433,48 @@ function App() {
         onEdit={handleEditTransaction}
         onDelete={handleDeleteExpense}
       />
+      {!isTransactionFormOpen && (
+        <button onClick={() => setIsTransactionFormOpen(true)}>
+          ＋ 収支を登録する
+        </button>
+      )}
 
-      <TransactionForm
-        type={type}
-        majorCategoryId={majorCategoryId}
-        minorCategoryId={minorCategoryId}
-        amount={amount}
-        memo={memo}
-        date={date}
-        source={source}
-        paymentMethodId={paymentMethodId}
-        scope={scope}
-        editingTransactionId={editingTransactionId}
-        incomeCategories={incomeCategories}
-        expenseMajorCategories={expenseMajorCategories}
-        expenseMinorCategories={expenseMinorCategories}
-        paymentMethods={initialPaymentMethods}
-        onTypeChange={(value) => {
-          setType(value);
-          setMajorCategoryId("");
-          setMinorCategoryId("");
-        }}
-        onMajorCategoryChange={(value) => {
-          setMajorCategoryId(value);
-          setMinorCategoryId("");
-        }}
-        onMinorCategoryChange={setMinorCategoryId}
-        onAmountChange={setAmount}
-        onMemoChange={setMemo}
-        onDateChange={setDate}
-        onSourceChange={setSource}
-        onPaymentMethodChange={setPaymentMethodId}
-        onScopeChange={setScope}
-        onSubmit={handleExpenseClick}
-        onCancel={resetForm}
-      />
+      {isTransactionFormOpen && (
+        <TransactionForm
+          type={type}
+          majorCategoryId={majorCategoryId}
+          minorCategoryId={minorCategoryId}
+          amount={amount}
+          memo={memo}
+          date={date}
+          source={source}
+          paymentMethodId={paymentMethodId}
+          scope={scope}
+          editingTransactionId={editingTransactionId}
+          incomeCategories={incomeCategories}
+          expenseMajorCategories={expenseMajorCategories}
+          expenseMinorCategories={expenseMinorCategories}
+          paymentMethods={initialPaymentMethods}
+          onTypeChange={(value) => {
+            setType(value);
+            setMajorCategoryId("");
+            setMinorCategoryId("");
+          }}
+          onMajorCategoryChange={(value) => {
+            setMajorCategoryId(value);
+            setMinorCategoryId("");
+          }}
+          onMinorCategoryChange={setMinorCategoryId}
+          onAmountChange={setAmount}
+          onMemoChange={setMemo}
+          onDateChange={setDate}
+          onSourceChange={setSource}
+          onPaymentMethodChange={setPaymentMethodId}
+          onScopeChange={setScope}
+          onSubmit={handleExpenseClick}
+          onCancel={resetForm}
+        />
+      )}
 
       <CategoryBudgetPanel
         selectedMonth={selectedMonth}
@@ -473,7 +484,6 @@ function App() {
         statuses={categoryBudgetStatuses}
         onSave={handleSaveCategoryBudget}
       />
-
     </main>
   );
 }
