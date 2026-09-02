@@ -204,11 +204,14 @@ function TransactionForm(
                     : "収支を更新する"}
             </button>
 
-            {props.editingTransactionId !== null && (
-                <button type="button" onClick={props.onCancel}>
-                    編集をやめる
-                </button>
-            )}
+            <button type="button"
+                className="cancel-button"
+                onClick={props.onCancel}
+            >
+                {props.editingTransactionId === null
+                    ? "入力をやめる"
+                    : "編集をやめる"}
+            </button>
         </section>
     );
 }

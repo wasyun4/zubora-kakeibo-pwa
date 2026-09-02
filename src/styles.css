@@ -244,3 +244,12 @@ li button {
   color: #1b5e20;
   background: #edf7f0;
 }
+
+.cancel-button {
+  color: #455a64;
+  background: #eceff1;
+}
+
+.cancel-button:hover {
+  background: #cfd8dc;
+}

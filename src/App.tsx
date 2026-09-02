@@ -415,29 +415,38 @@ function App() {
         onMonthChange={setSelectedMonth}
       />
 
-      <Summary
-        incomeTotal={incomeTotal}
-        expenseTotal={expenseTotal}
-        savingsTotal={savingsTotal}
-        availableBalance={availableBalance}
-      />
+      {activeView === "home" &&
+        <>
+          <Summary
+            incomeTotal={incomeTotal}
+            expenseTotal={expenseTotal}
+            savingsTotal={savingsTotal}
+            availableBalance={availableBalance}
+          />
 
-      <MonthlyBudgetPanel
-        selectedMonth={selectedMonth}
-        budgetAmount={budgetAmount}
-        savedBudgetAmount={selectedBudget?.amount ?? null}
-        remainingBudget={remainingBudget}
-        onBudgetAmountChange={setBudgetAmount}
-        onSave={handleSaveBudget}
-      />
+          <MonthlyBudgetPanel
+            selectedMonth={selectedMonth}
+            budgetAmount={budgetAmount}
+            savedBudgetAmount={selectedBudget?.amount ?? null}
+            remainingBudget={remainingBudget}
+            onBudgetAmountChange={setBudgetAmount}
+            onSave={handleSaveBudget}
+          />
+        </>
+      }
 
-      <CategoryTotals categoryTotals={expenseCategoryTotals} />
+      {activeView === "analysis" && (
+        <CategoryTotals categoryTotals={expenseCategoryTotals} />
+      )}
 
-      <TransactionList
-        transactions={filteredExpenses}
-        onEdit={handleEditTransaction}
-        onDelete={handleDeleteExpense}
-      />
+      {activeView === "records" && (
+        <TransactionList
+          transactions={filteredExpenses}
+          onEdit={handleEditTransaction}
+          onDelete={handleDeleteExpense}
+        />
+      )}
+
       {!isTransactionFormOpen && (
         <button
           className="floating-add-button"
@@ -485,14 +494,16 @@ function App() {
         />
       )}
 
-      <CategoryBudgetPanel
-        selectedMonth={selectedMonth}
-        categories={expenseMajorCategories.filter(
-          (category) => category.id !== "savings",
-        )}
-        statuses={categoryBudgetStatuses}
-        onSave={handleSaveCategoryBudget}
-      />
+      {activeView === "settings" && (
+        <CategoryBudgetPanel
+          selectedMonth={selectedMonth}
+          categories={expenseMajorCategories.filter(
+            (category) => category.id !== "savings",
+          )}
+          statuses={categoryBudgetStatuses}
+          onSave={handleSaveCategoryBudget}
+        />
+      )}
 
       <BottomNavigation
         activeView={activeView}
