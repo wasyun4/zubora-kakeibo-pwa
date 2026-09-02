@@ -23,3 +23,9 @@ export type CategoryBudget = {
   majorCategoryId: string;
   amount: number;
 };
+
+export type AppView =
+  | "home"
+  | "records"
+  | "analysis"
+  | "settings";

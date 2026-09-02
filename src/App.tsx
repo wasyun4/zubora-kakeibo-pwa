@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
 import type {
+  AppView,
   CategoryBudget,
   MonthlyBudget,
   Transaction,
@@ -17,6 +18,8 @@ import TransactionList from "./components/TransactionList";
 import TransactionForm from "./components/TransactionForm";
 import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
 import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
+import BottomNavigation from "./components/BottomNavigation";
+
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -48,6 +51,8 @@ function App() {
     useState<string | null>(null);
   const [isTransactionFormOpen, setIsTransactionFormOpen] =
     useState(false);
+  const [activeView, setActiveView] =
+    useState<AppView>("home");
   const [selectedMonth, setSelectedMonth] = useState("");
   // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
@@ -488,6 +493,12 @@ function App() {
         statuses={categoryBudgetStatuses}
         onSave={handleSaveCategoryBudget}
       />
+
+      <BottomNavigation
+        activeView={activeView}
+        onViewChange={setActiveView}
+      />
+
     </main>
   );
 }
