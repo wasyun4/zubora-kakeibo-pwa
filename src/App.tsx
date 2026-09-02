@@ -415,6 +415,7 @@ function App() {
         onMonthChange={setSelectedMonth}
       />
 
+      {/*ホーム画面*/}
       {activeView === "home" &&
         <>
           <Summary
@@ -432,13 +433,20 @@ function App() {
             onBudgetAmountChange={setBudgetAmount}
             onSave={handleSaveBudget}
           />
+
+          <CategoryTotals
+            categoryTotals={expenseCategoryTotals}
+          />
+
         </>
       }
 
+      {/*分析画面*/}
       {activeView === "analysis" && (
         <CategoryTotals categoryTotals={expenseCategoryTotals} />
       )}
 
+      {/*記録画面*/}
       {activeView === "records" && (
         <TransactionList
           transactions={filteredExpenses}
@@ -494,6 +502,7 @@ function App() {
         />
       )}
 
+      {/*設定画面*/}
       {activeView === "settings" && (
         <CategoryBudgetPanel
           selectedMonth={selectedMonth}
