@@ -1,6 +1,8 @@
 // 【カテゴリ別支出合計】
 // App.tsxで計算された大カテゴリごとの支出合計を一覧表示する部品です。
 
+import { formatCurrency } from "../utils/formatCurrency";
+
 type CategoryTotal = {
   id: string;
   name: string;
@@ -21,7 +23,7 @@ function CategoryTotals({
       <ul>
         {categoryTotals.map((category) => (
           <li key={category.id}>
-            {category.name}：{category.total}円
+            {category.name}：{formatCurrency(category.total)}
           </li>
         ))}
       </ul>

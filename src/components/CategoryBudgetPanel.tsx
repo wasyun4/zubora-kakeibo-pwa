@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import type { Category } from "../categories";
+import { formatCurrency } from "../utils/formatCurrency";
 
 type CategoryBudgetPanelProps = {
     selectedMonth: string;
@@ -83,15 +84,15 @@ function CategoryBudgetPanel({
                         <li key={status.id}>
                             <strong>{status.name}</strong>
                             <br />
-                            予算：{status.budget.toLocaleString()}円
+                            予算：{formatCurrency(status.budget)}
                             <br />
-                            使用：{status.spent.toLocaleString()}円
+                            使用：{formatCurrency(status.spent)}
                             <br />
                             {status.remaining >= 0
-                                ? `残り：${status.remaining.toLocaleString()}円`
-                                : `予算オーバー：${Math.abs(
-                                    status.remaining,
-                                ).toLocaleString()}円`}
+                                ? `残り：${formatCurrency(status.remaining)}`
+                                : `予算オーバー：${formatCurrency(
+                                    Math.abs(status.remaining),
+                                )}`}
                         </li>
                     ))}
                 </ul>

@@ -1,6 +1,8 @@
 // 【月間収支まとめ】
 // App.tsxで計算された収入・生活支出・貯金・使える残りを表示する部品です。
 
+import { formatCurrency } from "../utils/formatCurrency";
+
 type SummaryProps = {
   incomeTotal: number;
   expenseTotal: number;
@@ -18,22 +20,22 @@ function Summary({
     <section className="summary">
       <div className="summary-item income">
         <span>収入合計</span>
-        <strong>{incomeTotal}円</strong>
+        <strong>{formatCurrency(incomeTotal)}</strong>
       </div>
 
       <div className="summary-item expense">
         <span>生活支出</span>
-        <strong>{expenseTotal}円</strong>
+        <strong>{formatCurrency(expenseTotal)}</strong>
       </div>
 
       <div className="summary-item savings">
         <span>貯金</span>
-        <strong>{savingsTotal}円</strong>
+        <strong>{formatCurrency(savingsTotal)}</strong>
       </div>
 
       <div className="summary-item balance">
         <span>使える残り</span>
-        <strong>{availableBalance}円</strong>
+        <strong>{formatCurrency(availableBalance)}</strong>
       </div>
     </section>
   );

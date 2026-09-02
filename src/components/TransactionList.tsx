@@ -4,6 +4,7 @@
 import { initialCategories } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction } from "../types";
+import { formatCurrency } from "../utils/formatCurrency";
 
 type TransactionListProps = {
     transactions: Transaction[];
@@ -41,7 +42,7 @@ function TransactionList({
                     <li key={transaction.id}>
                         {transaction.type === "expense" ? "支出" : "収入"}：
                         {transaction.date || "日付なし"}：
-                        {transaction.amount}円：
+                        {formatCurrency(transaction.amount)}：
                         {transaction.memo || "メモなし"}：
                         {transaction.source || "収支元なし"}：
                         {getCategoryName(transaction.majorCategoryId)}
