@@ -1,3 +1,6 @@
+// 【カテゴリ別予算】
+// 大カテゴリごとの予算入力と保存操作、使用額、残額を表示する部品です。
+
 import { useState } from "react";
 import type { Category } from "../categories";
 

@@ -1,3 +1,6 @@
+// 【収支入力フォーム】
+// 収入・支出の入力欄を表示し、入力内容や登録操作をApp.tsxへ伝える部品です。
+
 import type { Category } from "../categories";
 import type { PaymentMethod } from "../paymentMethods";
 import type { TransactionScope } from "../types";

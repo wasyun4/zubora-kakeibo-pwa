@@ -1,3 +1,6 @@
+// 【表示月の選択】
+// 表示対象の月を選択し、選ばれた年月をApp.tsxへ伝える部品です。
+
 type MonthFilterProps = {
     selectedMonth: string;
     onMonthChange: (month: string) => void;

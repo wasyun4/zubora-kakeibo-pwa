@@ -1,3 +1,6 @@
+// 【月間収支まとめ】
+// App.tsxで計算された収入・生活支出・貯金・使える残りを表示する部品です。
+
 type SummaryProps = {
   incomeTotal: number;
   expenseTotal: number;

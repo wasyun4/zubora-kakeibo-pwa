@@ -1,3 +1,6 @@
+// 【収支履歴一覧】
+// 登録済みの収支を一覧表示し、編集・削除するIDをApp.tsxへ伝える部品です。
+
 import { initialCategories } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction } from "../types";

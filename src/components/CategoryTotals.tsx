@@ -1,3 +1,6 @@
+// 【カテゴリ別支出合計】
+// App.tsxで計算された大カテゴリごとの支出合計を一覧表示する部品です。
+
 type CategoryTotal = {
   id: string;
   name: string;

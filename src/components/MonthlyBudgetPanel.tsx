@@ -1,3 +1,6 @@
+// 【月間生活費予算】
+// 月全体の予算入力と保存操作、使用率、残り予算を表示する部品です。
+
 type MonthlyBudgetPanelProps = {
     selectedMonth: string;
     budgetAmount: string;
