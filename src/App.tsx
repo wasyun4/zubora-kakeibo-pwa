@@ -1,3 +1,6 @@
+// 【家計簿アプリ全体の司令塔】
+// データの管理・集計・操作を行い、各画面コンポーネントを組み合わせるファイルです。
+
 import { useEffect, useState } from "react";
 import { initialCategories } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
@@ -16,6 +19,7 @@ import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
 import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
 
 function App() {
+  // 【収入・支出の大カテゴリ抽出】
   const incomeCategories = initialCategories.filter(
     (category) =>
       category.type === "income" &&
@@ -30,6 +34,7 @@ function App() {
       category.isActive,
   );
 
+  // 【収支入力フォームの状態管理】
   const [type, setType] = useState("expense");
   const [majorCategoryId, setMajorCategoryId] = useState("");
   const [minorCategoryId, setMinorCategoryId] = useState("");
@@ -42,6 +47,7 @@ function App() {
   const [editingTransactionId, setEditingTransactionId] =
     useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState("");
+  // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
   const [monthlyBudgets, setMonthlyBudgets] =
     useState<MonthlyBudget[]>(() => {
@@ -50,6 +56,7 @@ function App() {
 
       return savedBudgets ? JSON.parse(savedBudgets) : [];
     });
+  // 【カテゴリ別予算データ管理】
   const [categoryBudgets, setCategoryBudgets] =
     useState<CategoryBudget[]>(() => {
       const savedCategoryBudgets =
@@ -59,8 +66,10 @@ function App() {
         ? JSON.parse(savedCategoryBudgets)
         : [];
     });
+  // 【店舗・収入元の状態管理】
   const [source, setSource] = useState("");
 
+  // 【選択した大カテゴリに属する小カテゴリ抽出】
   const expenseMinorCategories = initialCategories.filter(
     (category) =>
       category.type === "expense" &&
@@ -68,6 +77,7 @@ function App() {
       category.isActive,
   );
 
+  // 【収支履歴の読み込みと状態管理】
   const [expenses, setExpenses] = useState<Transaction[]>(() => {
     const savedExpenses = localStorage.getItem("expenses");
 
@@ -81,6 +91,7 @@ function App() {
     }));
   });
 
+  // 【収支履歴のlocalStorage保存】
   useEffect(() => {
     localStorage.setItem(
       "expenses",
@@ -88,6 +99,7 @@ function App() {
     );
   }, [expenses]);
 
+  // 【月予算のlocalStorage保存】
   useEffect(() => {
     localStorage.setItem(
       "monthlyBudgets",
@@ -95,6 +107,7 @@ function App() {
     );
   }, [monthlyBudgets]);
 
+  // 【選択月の予算を入力欄へ反映】
   useEffect(() => {
     const savedBudget = monthlyBudgets.find(
       (budget) => budget.month === selectedMonth,
@@ -105,6 +118,7 @@ function App() {
     );
   }, [selectedMonth, monthlyBudgets]);
 
+  // 【カテゴリ別予算のlocalStorage保存】
   useEffect(() => {
     localStorage.setItem(
       "categoryBudgets",
@@ -112,6 +126,7 @@ function App() {
     );
   }, [categoryBudgets]);
 
+  // 【表示月による収支の絞り込み】
   const filteredExpenses =
     selectedMonth === ""
       ? expenses
@@ -119,6 +134,7 @@ function App() {
         expense.date.startsWith(selectedMonth),
       );
 
+  // 【生活支出合計の計算】
   const expenseTotal = filteredExpenses
     .filter(
       (expense) =>
@@ -130,6 +146,7 @@ function App() {
       0,
     );
 
+  // 【貯金合計の計算】
   const savingsTotal = filteredExpenses
     .filter(
       (expense) =>
@@ -141,6 +158,7 @@ function App() {
       0,
     );
 
+  // 【収入合計の計算】
   const incomeTotal = filteredExpenses
     .filter((expense) => expense.type === "income")
     .reduce(
@@ -148,6 +166,7 @@ function App() {
       0,
     );
 
+  // 【大カテゴリ別支出合計の計算】
   const expenseCategoryTotals = expenseMajorCategories
     .filter((category) => category.id !== "savings")
     .map((category) => {
@@ -170,6 +189,7 @@ function App() {
     })
     .filter((category) => category.total > 0);
 
+  // 【カテゴリ別予算の使用額と残額計算】
   const categoryBudgetStatuses = categoryBudgets
     .filter((budget) => budget.month === selectedMonth)
     .map((budget) => {
@@ -192,9 +212,11 @@ function App() {
       };
     });
 
+  // 【使える残り金額の計算】
   const availableBalance =
     incomeTotal - expenseTotal - savingsTotal;
 
+  // 【選択月の月予算と残額計算】
   const selectedBudget = monthlyBudgets.find(
     (budget) => budget.month === selectedMonth,
   );
@@ -204,6 +226,7 @@ function App() {
       ? null
       : selectedBudget.amount - expenseTotal;
 
+  // 【月全体の予算保存】
   function handleSaveBudget() {
     if (selectedMonth === "") {
       alert("予算を設定する月を選択してください。");
@@ -237,6 +260,7 @@ function App() {
     alert(`${selectedMonth}の予算を保存しました！`);
   }
 
+  // 【カテゴリ別予算の保存】
   function handleSaveCategoryBudget(
     majorCategoryId: string,
     amount: number,
@@ -267,6 +291,7 @@ function App() {
     alert("カテゴリ予算を保存しました！");
   }
 
+  // 【収支入力フォームの初期化】
   function resetForm() {
     setAmount("");
     setMemo("");
@@ -279,6 +304,7 @@ function App() {
     setEditingTransactionId(null);
   }
 
+  // 【収支の新規登録・更新】
   function handleExpenseClick() {
     if (amount === "" || Number(amount) <= 0) {
       alert("1円以上の金額を入力してください。");
@@ -340,12 +366,14 @@ function App() {
     resetForm();
   }
 
+  // 【収支履歴の削除】
   function handleDeleteExpense(id: string) {
     setExpenses(
       expenses.filter((expense) => expense.id !== id),
     );
   }
 
+  // 【収支履歴の編集開始】
   function handleEditTransaction(id: string) {
     const transaction = expenses.find(
       (expense) => expense.id === id,
@@ -367,6 +395,7 @@ function App() {
     setEditingTransactionId(transaction.id);
   }
 
+  // 【画面コンポーネントの組み立て】
   return (
     <main>
       <h1>家計簿アプリ</h1>
