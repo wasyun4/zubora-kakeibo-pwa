@@ -401,6 +401,35 @@ function App() {
       <h1>家計簿アプリ</h1>
       <p>ここから少しずつ作っていきます。</p>
 
+      <MonthFilter
+        selectedMonth={selectedMonth}
+        onMonthChange={setSelectedMonth}
+      />
+
+      <Summary
+        incomeTotal={incomeTotal}
+        expenseTotal={expenseTotal}
+        savingsTotal={savingsTotal}
+        availableBalance={availableBalance}
+      />
+
+      <MonthlyBudgetPanel
+        selectedMonth={selectedMonth}
+        budgetAmount={budgetAmount}
+        savedBudgetAmount={selectedBudget?.amount ?? null}
+        remainingBudget={remainingBudget}
+        onBudgetAmountChange={setBudgetAmount}
+        onSave={handleSaveBudget}
+      />
+
+      <CategoryTotals categoryTotals={expenseCategoryTotals} />
+
+      <TransactionList
+        transactions={filteredExpenses}
+        onEdit={handleEditTransaction}
+        onDelete={handleDeleteExpense}
+      />
+
       <TransactionForm
         type={type}
         majorCategoryId={majorCategoryId}
@@ -436,21 +465,6 @@ function App() {
         onCancel={resetForm}
       />
 
-
-      <MonthFilter
-        selectedMonth={selectedMonth}
-        onMonthChange={setSelectedMonth}
-      />
-
-      <MonthlyBudgetPanel
-        selectedMonth={selectedMonth}
-        budgetAmount={budgetAmount}
-        savedBudgetAmount={selectedBudget?.amount ?? null}
-        remainingBudget={remainingBudget}
-        onBudgetAmountChange={setBudgetAmount}
-        onSave={handleSaveBudget}
-      />
-
       <CategoryBudgetPanel
         selectedMonth={selectedMonth}
         categories={expenseMajorCategories.filter(
@@ -460,20 +474,6 @@ function App() {
         onSave={handleSaveCategoryBudget}
       />
 
-      <Summary
-        incomeTotal={incomeTotal}
-        expenseTotal={expenseTotal}
-        savingsTotal={savingsTotal}
-        availableBalance={availableBalance}
-      />
-
-      <CategoryTotals categoryTotals={expenseCategoryTotals} />
-
-      <TransactionList
-        transactions={filteredExpenses}
-        onEdit={handleEditTransaction}
-        onDelete={handleDeleteExpense}
-      />
     </main>
   );
 }
