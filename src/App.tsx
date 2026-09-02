@@ -434,8 +434,12 @@ function App() {
         onDelete={handleDeleteExpense}
       />
       {!isTransactionFormOpen && (
-        <button onClick={() => setIsTransactionFormOpen(true)}>
-          ＋ 収支を登録する
+        <button
+          className="floating-add-button"
+          aria-label="収支を登録する"
+          onClick={() => setIsTransactionFormOpen(true)}
+        >
+          ＋
         </button>
       )}
 
