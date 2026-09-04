@@ -425,6 +425,16 @@ function App() {
             availableBalance={availableBalance}
           />
 
+          <MonthlyBudgetPanel
+            selectedMonth={selectedMonth}
+            budgetAmount={budgetAmount}
+            savedBudgetAmount={selectedBudget?.amount ?? null}
+            remainingBudget={remainingBudget}
+            isEditable={false}
+            onBudgetAmountChange={setBudgetAmount}
+            onSave={handleSaveBudget}
+          />
+
           <CategoryTotals
             categoryTotals={expenseCategoryTotals}
           />
@@ -445,6 +455,7 @@ function App() {
             budgetAmount={budgetAmount}
             savedBudgetAmount={selectedBudget?.amount ?? null}
             remainingBudget={remainingBudget}
+            isEditable={true}
             onBudgetAmountChange={setBudgetAmount}
             onSave={handleSaveBudget}
           />

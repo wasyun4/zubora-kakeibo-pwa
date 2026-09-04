@@ -8,6 +8,7 @@ type MonthlyBudgetPanelProps = {
     budgetAmount: string;
     savedBudgetAmount: number | null;
     remainingBudget: number | null;
+    isEditable: boolean;
     onBudgetAmountChange: (value: string) => void;
     onSave: () => void;
 };
@@ -17,6 +18,7 @@ function MonthlyBudgetPanel({
     budgetAmount,
     savedBudgetAmount,
     remainingBudget,
+    isEditable,
     onBudgetAmountChange,
     onSave,
 }: MonthlyBudgetPanelProps) {
@@ -36,19 +38,23 @@ function MonthlyBudgetPanel({
                 <p>予算を設定する月を選択してください。</p>
             ) : (
                 <>
-                    <label>
-                        予算金額
-                        <input
-                            type="number"
-                            placeholder="例：100000"
-                            value={budgetAmount}
-                            onChange={(event) =>
-                                onBudgetAmountChange(event.target.value)
-                            }
-                        />
-                    </label>
+                    {isEditable && (
+                        <>
+                            <label>
+                                予算金額
+                                <input
+                                    type="number"
+                                    placeholder="例：100000"
+                                    value={budgetAmount}
+                                    onChange={(event) =>
+                                        onBudgetAmountChange(event.target.value)
+                                    }
+                                />
+                            </label>
 
-                    <button onClick={onSave}>予算を保存する</button>
+                            <button onClick={onSave}>予算を保存する</button>
+                        </>
+                    )}
 
                     {savedBudgetAmount === null ||
                         remainingBudget === null ? (
