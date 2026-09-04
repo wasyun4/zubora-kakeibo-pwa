@@ -11,10 +11,12 @@ function MonthFilter({
     onMonthChange,
 }: MonthFilterProps) {
     return (
-        <label>
-            表示する月
+        <label className="month-filter">
+            <span>表示月</span>
+
             <input
                 type="month"
+                aria-label="表示する月"
                 value={selectedMonth}
                 onChange={(event) =>
                     onMonthChange(event.target.value)
