@@ -8,6 +8,7 @@ type SummaryProps = {
   expenseTotal: number;
   savingsTotal: number;
   availableBalance: number;
+  isExpenseOverBudget: boolean;
 };
 
 function Summary({
@@ -15,6 +16,7 @@ function Summary({
   expenseTotal,
   savingsTotal,
   availableBalance,
+  isExpenseOverBudget,
 }: SummaryProps) {
   return (
     <section className="summary">
@@ -25,7 +27,11 @@ function Summary({
 
       <div className="summary-item expense">
         <span>生活支出</span>
-        <strong>{formatCurrency(expenseTotal)}</strong>
+        <strong
+          className={isExpenseOverBudget ? "over-budget" : ""}
+        >
+          {formatCurrency(expenseTotal)}
+        </strong>
       </div>
 
       <div className="summary-item savings">

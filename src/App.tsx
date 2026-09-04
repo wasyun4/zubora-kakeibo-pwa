@@ -449,6 +449,9 @@ function App() {
             expenseTotal={expenseTotal}
             savingsTotal={savingsTotal}
             availableBalance={availableBalance}
+            isExpenseOverBudget={
+              remainingBudget !== null && remainingBudget < 0
+            }
           />
 
           <MonthlyBudgetPanel

@@ -80,7 +80,7 @@ function MonthlyBudgetPanel({
                             {remainingBudget >= 0 ? (
                                 <p>残り予算：{formatCurrency(remainingBudget)}</p>
                             ) : (
-                                <p>
+                                <p className="over-budget">
                                     予算オーバー：
                                     {formatCurrency(Math.abs(remainingBudget))}
                                 </p>

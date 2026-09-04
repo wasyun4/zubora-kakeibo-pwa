@@ -30,7 +30,15 @@ function CategoryBudgetComparison({
                             <strong>{item.name}</strong>
 
                             <div className="category-comparison-values">
-                                <span>支出：{formatCurrency(item.spent)}</span>
+                                <span
+                                    className={
+                                        item.budget !== null && item.spent > item.budget
+                                            ? "over-budget"
+                                            : ""
+                                    }
+                                >
+                                    支出：{formatCurrency(item.spent)}
+                                </span>
                                 <span>
                                     予算：
                                     {item.budget === null

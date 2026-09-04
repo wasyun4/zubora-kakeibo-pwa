@@ -269,3 +269,8 @@ li button {
 .category-comparison-values span:last-child {
   text-align: right;
 }
+
+.over-budget {
+  color: #d32f2f;
+  font-weight: bold;
+}
