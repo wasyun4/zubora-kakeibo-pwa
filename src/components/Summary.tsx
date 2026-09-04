@@ -20,13 +20,21 @@ function Summary({
 }: SummaryProps) {
   return (
     <section className="summary">
+      <h2>今月の収支</h2>
+
       <div className="summary-item income">
-        <span>収入合計</span>
+        <span className="summary-label">
+          <span className="summary-icon">＋</span>
+          収入
+        </span>
         <strong>{formatCurrency(incomeTotal)}</strong>
       </div>
 
       <div className="summary-item expense">
-        <span>生活支出</span>
+        <span className="summary-label">
+          <span className="summary-icon">－</span>
+          生活支出
+        </span>
         <strong
           className={isExpenseOverBudget ? "over-budget" : ""}
         >
@@ -35,12 +43,18 @@ function Summary({
       </div>
 
       <div className="summary-item savings">
-        <span>貯金</span>
+        <span className="summary-label">
+          <span className="summary-icon">貯</span>
+          貯金
+        </span>
         <strong>{formatCurrency(savingsTotal)}</strong>
       </div>
 
       <div className="summary-item balance">
-        <span>使える残り</span>
+        <span className="summary-label">
+          <span className="summary-icon">残</span>
+          使える残り
+        </span>
         <strong>{formatCurrency(availableBalance)}</strong>
       </div>
     </section>
