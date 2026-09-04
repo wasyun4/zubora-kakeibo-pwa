@@ -425,15 +425,6 @@ function App() {
             availableBalance={availableBalance}
           />
 
-          <MonthlyBudgetPanel
-            selectedMonth={selectedMonth}
-            budgetAmount={budgetAmount}
-            savedBudgetAmount={selectedBudget?.amount ?? null}
-            remainingBudget={remainingBudget}
-            onBudgetAmountChange={setBudgetAmount}
-            onSave={handleSaveBudget}
-          />
-
           <CategoryTotals
             categoryTotals={expenseCategoryTotals}
           />
@@ -444,6 +435,29 @@ function App() {
       {/*分析画面*/}
       {activeView === "analysis" && (
         <CategoryTotals categoryTotals={expenseCategoryTotals} />
+      )}
+
+      {/* 予算画面 */}
+      {activeView === "budget" && (
+        <>
+          <MonthlyBudgetPanel
+            selectedMonth={selectedMonth}
+            budgetAmount={budgetAmount}
+            savedBudgetAmount={selectedBudget?.amount ?? null}
+            remainingBudget={remainingBudget}
+            onBudgetAmountChange={setBudgetAmount}
+            onSave={handleSaveBudget}
+          />
+
+          <CategoryBudgetPanel
+            selectedMonth={selectedMonth}
+            categories={expenseMajorCategories.filter(
+              (category) => category.id !== "savings",
+            )}
+            statuses={categoryBudgetStatuses}
+            onSave={handleSaveCategoryBudget}
+          />
+        </>
       )}
 
       {/*記録画面*/}
@@ -502,16 +516,12 @@ function App() {
         />
       )}
 
-      {/*設定画面*/}
+      {/* 設定画面 */}
       {activeView === "settings" && (
-        <CategoryBudgetPanel
-          selectedMonth={selectedMonth}
-          categories={expenseMajorCategories.filter(
-            (category) => category.id !== "savings",
-          )}
-          statuses={categoryBudgetStatuses}
-          onSave={handleSaveCategoryBudget}
-        />
+        <section>
+          <h2>設定</h2>
+          <p>設定機能はこれから追加します。</p>
+        </section>
       )}
 
       <BottomNavigation

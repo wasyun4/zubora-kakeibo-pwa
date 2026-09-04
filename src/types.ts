@@ -27,5 +27,6 @@ export type CategoryBudget = {
 export type AppView =
   | "home"
   | "records"
+  | "budget"
   | "analysis"
   | "settings";

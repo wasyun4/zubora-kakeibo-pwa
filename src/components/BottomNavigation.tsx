@@ -1,5 +1,5 @@
 // 【画面下部メニュー】
-// ホーム・記録・分析・設定の画面切り替えをApp.tsxへ伝える部品です。
+// ホーム・記録・予算・分析・設定の画面切り替えをApp.tsxへ伝える部品です。
 
 import type { AppView } from "../types";
 
@@ -33,6 +33,15 @@ function BottomNavigation({
             >
                 <span>✎</span>
                 記録
+            </button>
+
+            <button
+                type="button"
+                className={activeView === "budget" ? "active" : ""}
+                onClick={() => onViewChange("budget")}
+            >
+                <span>￥</span>
+                予算
             </button>
 
             <button
