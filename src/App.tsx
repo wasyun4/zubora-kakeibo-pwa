@@ -19,6 +19,7 @@ import TransactionForm from "./components/TransactionForm";
 import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
 import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
 import BottomNavigation from "./components/BottomNavigation";
+import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 
 
 function App() {
@@ -195,6 +196,31 @@ function App() {
       };
     })
     .filter((category) => category.total > 0);
+
+  // 【カテゴリ別の支出実績と予算を結合】
+  const categoryBudgetComparisons = expenseMajorCategories
+    .filter((category) => category.id !== "savings")
+    .map((category) => {
+      const categoryTotal = expenseCategoryTotals.find(
+        (item) => item.id === category.id,
+      );
+
+      const categoryBudget = categoryBudgets.find(
+        (budget) =>
+          budget.month === selectedMonth &&
+          budget.majorCategoryId === category.id,
+      );
+
+      return {
+        id: category.id,
+        name: category.name,
+        spent: categoryTotal?.total ?? 0,
+        budget: categoryBudget?.amount ?? null,
+      };
+    })
+    .filter(
+      (item) => item.spent > 0 || item.budget !== null,
+    );
 
   // 【カテゴリ別予算の使用額と残額計算】
   const categoryBudgetStatuses = categoryBudgets
@@ -435,10 +461,9 @@ function App() {
             onSave={handleSaveBudget}
           />
 
-          <CategoryTotals
-            categoryTotals={expenseCategoryTotals}
+          <CategoryBudgetComparison
+            items={categoryBudgetComparisons}
           />
-
         </>
       }
 
