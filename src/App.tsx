@@ -20,7 +20,7 @@ import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
 import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
 import BottomNavigation from "./components/BottomNavigation";
 import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
-
+import SettingsPanel from "./components/SettingsPanel";
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -55,6 +55,11 @@ function App() {
   const [activeView, setActiveView] =
     useState<AppView>("home");
   const [selectedMonth, setSelectedMonth] = useState("");
+
+  // 【月初め日の設定管理】
+  const [monthStartDay, setMonthStartDay] = useState(
+    () => localStorage.getItem("monthStartDay") ?? "1",
+  );
   // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
   const [monthlyBudgets, setMonthlyBudgets] =
@@ -324,6 +329,24 @@ function App() {
     alert("カテゴリ予算を保存しました！");
   }
 
+  // 【月初め日の保存】
+  function handleSaveMonthStartDay() {
+    const startDay = Number(monthStartDay);
+
+    if (startDay < 1 || startDay > 28) {
+      alert("月初め日は1日から28日の間で入力してください。");
+      return;
+    }
+
+    localStorage.setItem(
+      "monthStartDay",
+      String(startDay),
+    );
+
+    setMonthStartDay(String(startDay));
+    alert(`月初め日を${startDay}日に設定しました！`);
+  }
+
   // 【収支入力フォームの初期化】
   function resetForm() {
     setAmount("");
@@ -438,6 +461,7 @@ function App() {
 
       <MonthFilter
         selectedMonth={selectedMonth}
+        monthStartDay={monthStartDay}
         onMonthChange={setSelectedMonth}
       />
 
@@ -563,10 +587,11 @@ function App() {
 
       {/* 設定画面 */}
       {activeView === "settings" && (
-        <section>
-          <h2>設定</h2>
-          <p>設定機能はこれから追加します。</p>
-        </section>
+        <SettingsPanel
+          monthStartDay={monthStartDay}
+          onMonthStartDayChange={setMonthStartDay}
+          onSave={handleSaveMonthStartDay}
+        />
       )}
 
       <BottomNavigation
