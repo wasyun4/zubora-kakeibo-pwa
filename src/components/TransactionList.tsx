@@ -5,6 +5,9 @@ import { initialCategories } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction } from "../types";
 import { formatCurrency } from "../utils/formatCurrency";
+import { useState } from "react";
+
+type SelectionMode = "none" | "edit" | "delete";
 
 type TransactionListProps = {
     transactions: Transaction[];
@@ -33,15 +36,76 @@ function TransactionList({
     onEdit,
     onDelete,
 }: TransactionListProps) {
+    const [selectionMode, setSelectionMode] =
+        useState<SelectionMode>("none");
+
+    function handleTransactionSelect(id: string) {
+        if (selectionMode === "edit") {
+            onEdit(id);
+            setSelectionMode("none");
+        }
+
+        if (selectionMode === "delete") {
+            const shouldDelete = window.confirm(
+                "この履歴を削除しますか？",
+            );
+
+            if (shouldDelete) {
+                onDelete(id);
+            }
+
+            setSelectionMode("none");
+        }
+    }
     return (
         <section>
             <h2>収支履歴</h2>
+
+            <div className="history-actions">
+                <button
+                    type="button"
+                    className="edit-button"
+                    onClick={() =>
+                        setSelectionMode(
+                            selectionMode === "edit" ? "none" : "edit",
+                        )
+                    }
+                >
+                    編集
+                </button>
+
+                <button
+                    type="button"
+                    className="delete-button"
+                    onClick={() =>
+                        setSelectionMode(
+                            selectionMode === "delete" ? "none" : "delete",
+                        )
+                    }
+                >
+                    削除
+                </button>
+            </div>
+
+            {selectionMode !== "none" && (
+                <p className="selection-guide">
+                    {selectionMode === "edit"
+                        ? "編集する履歴を選択してください。"
+                        : "削除する履歴を選択してください。"}
+                </p>
+            )}
 
             <ul>
                 {transactions.map((transaction) => (
                     <li
                         key={transaction.id}
-                        className="transaction-item"
+                        className={`transaction-item ${selectionMode !== "none"
+                            ? "transaction-selectable"
+                            : ""
+                            }`}
+                        onClick={() =>
+                            handleTransactionSelect(transaction.id)
+                        }
                     >
                         <div className="transaction-overview">
                             <div>
@@ -93,21 +157,6 @@ function TransactionList({
                             </span>
                         </div>
 
-                        <div className="transaction-actions">
-                            <button
-                                className="edit-button"
-                                onClick={() => onEdit(transaction.id)}
-                            >
-                                編集
-                            </button>
-
-                            <button
-                                className="delete-button"
-                                onClick={() => onDelete(transaction.id)}
-                            >
-                                削除
-                            </button>
-                        </div>
                     </li>
                 ))}
             </ul>

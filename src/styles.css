@@ -98,11 +98,6 @@ li button {
   margin-top: 0.5rem;
 }
 
-.transaction-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
 .edit-button {
   background: #1976d2;
 }
@@ -379,12 +374,28 @@ li button {
   border-radius: 0.3rem;
 }
 
-.transaction-actions {
-  justify-content: flex-end;
-  margin-top: 0.75rem;
+.history-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
-.transaction-actions button {
-  width: auto;
-  min-width: 5rem;
+.history-actions button {
+  margin: 0;
+}
+
+.selection-guide {
+  padding: 0.75rem;
+  color: #455a64;
+  text-align: center;
+  background: #edf2ef;
+  border-radius: 0.5rem;
+}
+
+.transaction-selectable {
+  cursor: pointer;
+  outline: 2px dashed #81a98d;
+}
+
+.transaction-selectable:hover {
+  background: #e8f4eb;
 }

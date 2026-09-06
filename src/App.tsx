@@ -501,59 +501,65 @@ function App() {
 
       {/*記録画面*/}
       {activeView === "records" && (
-        <TransactionList
-          transactions={filteredExpenses}
-          onEdit={handleEditTransaction}
-          onDelete={handleDeleteExpense}
-        />
+        <>
+          {isTransactionFormOpen && (
+            <TransactionForm
+              type={type}
+              majorCategoryId={majorCategoryId}
+              minorCategoryId={minorCategoryId}
+              amount={amount}
+              memo={memo}
+              date={date}
+              source={source}
+              paymentMethodId={paymentMethodId}
+              scope={scope}
+              editingTransactionId={editingTransactionId}
+              incomeCategories={incomeCategories}
+              expenseMajorCategories={expenseMajorCategories}
+              expenseMinorCategories={expenseMinorCategories}
+              paymentMethods={initialPaymentMethods}
+              onTypeChange={(value) => {
+                setType(value);
+                setMajorCategoryId("");
+                setMinorCategoryId("");
+              }}
+              onMajorCategoryChange={(value) => {
+                setMajorCategoryId(value);
+                setMinorCategoryId("");
+              }}
+              onMinorCategoryChange={setMinorCategoryId}
+              onAmountChange={setAmount}
+              onMemoChange={setMemo}
+              onDateChange={setDate}
+              onSourceChange={setSource}
+              onPaymentMethodChange={setPaymentMethodId}
+              onScopeChange={setScope}
+              onSubmit={handleExpenseClick}
+              onCancel={resetForm}
+            />
+          )}
+
+          <TransactionList
+            transactions={filteredExpenses}
+            onEdit={handleEditTransaction}
+            onDelete={handleDeleteExpense}
+          />
+        </>
       )}
 
       {!isTransactionFormOpen && (
         <button
           className="floating-add-button"
           aria-label="収支を登録する"
-          onClick={() => setIsTransactionFormOpen(true)}
+          onClick={() => {
+            setActiveView("records");
+            setIsTransactionFormOpen(true);
+          }}
         >
           ＋
         </button>
       )}
 
-      {isTransactionFormOpen && (
-        <TransactionForm
-          type={type}
-          majorCategoryId={majorCategoryId}
-          minorCategoryId={minorCategoryId}
-          amount={amount}
-          memo={memo}
-          date={date}
-          source={source}
-          paymentMethodId={paymentMethodId}
-          scope={scope}
-          editingTransactionId={editingTransactionId}
-          incomeCategories={incomeCategories}
-          expenseMajorCategories={expenseMajorCategories}
-          expenseMinorCategories={expenseMinorCategories}
-          paymentMethods={initialPaymentMethods}
-          onTypeChange={(value) => {
-            setType(value);
-            setMajorCategoryId("");
-            setMinorCategoryId("");
-          }}
-          onMajorCategoryChange={(value) => {
-            setMajorCategoryId(value);
-            setMinorCategoryId("");
-          }}
-          onMinorCategoryChange={setMinorCategoryId}
-          onAmountChange={setAmount}
-          onMemoChange={setMemo}
-          onDateChange={setDate}
-          onSourceChange={setSource}
-          onPaymentMethodChange={setPaymentMethodId}
-          onScopeChange={setScope}
-          onSubmit={handleExpenseClick}
-          onCancel={resetForm}
-        />
-      )}
 
       {/* 設定画面 */}
       {activeView === "settings" && (
