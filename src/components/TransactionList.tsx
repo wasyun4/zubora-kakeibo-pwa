@@ -39,25 +39,59 @@ function TransactionList({
 
             <ul>
                 {transactions.map((transaction) => (
-                    <li key={transaction.id}>
-                        {transaction.type === "expense" ? "支出" : "収入"}：
-                        {transaction.date || "日付なし"}：
-                        {formatCurrency(transaction.amount)}：
-                        {transaction.memo || "メモなし"}：
-                        {transaction.source || "収支元なし"}：
-                        {getCategoryName(transaction.majorCategoryId)}
-                        {transaction.type === "expense" &&
-                            `：${getCategoryName(
-                                transaction.minorCategoryId,
-                            )}`}
-                        ：
-                        {getPaymentMethodName(
-                            transaction.paymentMethodId,
-                        )}
-                        ：
-                        {transaction.scope === "shared"
-                            ? "共有"
-                            : "個人"}
+                    <li
+                        key={transaction.id}
+                        className="transaction-item"
+                    >
+                        <div className="transaction-overview">
+                            <div>
+                                <span
+                                    className={
+                                        transaction.type === "expense"
+                                            ? "transaction-type expense-type"
+                                            : "transaction-type income-type"
+                                    }
+                                >
+                                    {transaction.type === "expense" ? "支出" : "収入"}
+                                </span>
+
+                                <strong className="transaction-category">
+                                    {getCategoryName(
+                                        transaction.minorCategoryId ||
+                                        transaction.majorCategoryId,
+                                    )}
+                                </strong>
+                            </div>
+
+                            <strong
+                                className={
+                                    transaction.type === "expense"
+                                        ? "transaction-amount expense-amount"
+                                        : "transaction-amount income-amount"
+                                }
+                            >
+                                {transaction.type === "expense" ? "－" : "＋"}
+                                {formatCurrency(transaction.amount)}
+                            </strong>
+                        </div>
+
+                        <p className="transaction-memo">
+                            {transaction.memo || "メモなし"}
+                        </p>
+
+                        <div className="transaction-details">
+                            <span>{transaction.date || "日付なし"}</span>
+                            <span>{transaction.source || "収支元なし"}</span>
+                            <span>
+                                {getCategoryName(transaction.majorCategoryId)}
+                            </span>
+                            <span>
+                                {getPaymentMethodName(transaction.paymentMethodId)}
+                            </span>
+                            <span>
+                                {transaction.scope === "shared" ? "共有" : "個人"}
+                            </span>
+                        </div>
 
                         <div className="transaction-actions">
                             <button
