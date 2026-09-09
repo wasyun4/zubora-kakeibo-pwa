@@ -419,3 +419,21 @@ li button {
 .settings-backup small {
   color: #6b756f;
 }
+
+.csv-panel {
+  margin-top: 16px;
+}
+
+.csv-panel-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.csv-panel-actions button {
+  flex: 1;
+}
+
+.csv-panel small {
+  color: #6b756f;
+}
