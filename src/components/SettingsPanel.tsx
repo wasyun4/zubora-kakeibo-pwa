@@ -38,6 +38,27 @@ function SettingsPanel({
             <button type="button" onClick={onSave}>
                 月初め日を保存する
             </button>
+
+            <div className="settings-backup">
+                <h3>バックアップと復元</h3>
+
+                <p>
+                    家計簿のデータをファイルに保存したり、
+                    保存したファイルから復元したりできます。
+                </p>
+
+                <div className="settings-backup-actions">
+                    <button type="button" disabled>
+                        バックアップ
+                    </button>
+
+                    <button type="button" disabled>
+                        復元
+                    </button>
+                </div>
+
+                <small>この機能は現在準備中です。</small>
+            </div>
         </section>
     );
 }

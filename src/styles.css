@@ -399,3 +399,23 @@ li button {
 .transaction-selectable:hover {
   background: #e8f4eb;
 }
+
+.settings-backup {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #dfe7e2;
+}
+
+.settings-backup-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.settings-backup-actions button {
+  flex: 1;
+}
+
+.settings-backup small {
+  color: #6b756f;
+}
