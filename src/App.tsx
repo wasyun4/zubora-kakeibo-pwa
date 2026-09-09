@@ -21,6 +21,7 @@ import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
 import BottomNavigation from "./components/BottomNavigation";
 import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 import SettingsPanel from "./components/SettingsPanel";
+import { getAccountingPeriod } from "./utils/accountingPeriod";
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -139,12 +140,20 @@ function App() {
     );
   }, [categoryBudgets]);
 
+  // 【選択した表示月の集計期間】
+  const accountingPeriod = getAccountingPeriod(
+    selectedMonth,
+    monthStartDay,
+  );
+
   // 【表示月による収支の絞り込み】
   const filteredExpenses =
-    selectedMonth === ""
+    accountingPeriod === null
       ? expenses
-      : expenses.filter((expense) =>
-        expense.date.startsWith(selectedMonth),
+      : expenses.filter(
+        (expense) =>
+          expense.date >= accountingPeriod.start &&
+          expense.date <= accountingPeriod.end,
       );
 
   // 【生活支出合計の計算】

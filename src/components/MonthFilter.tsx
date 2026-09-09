@@ -1,6 +1,8 @@
 // 【表示月の選択】
 // 表示対象の月を選択し、選ばれた年月をApp.tsxへ伝える部品です。
 
+import { getAccountingPeriod } from "../utils/accountingPeriod";
+
 type MonthFilterProps = {
     selectedMonth: string;
     monthStartDay: string;
@@ -12,26 +14,10 @@ function MonthFilter({
     monthStartDay,
     onMonthChange,
 }: MonthFilterProps) {
-    const periodText = (() => {
-        if (!selectedMonth) return "";
-
-        const [year, month] = selectedMonth
-            .split("-")
-            .map(Number);
-        const startDay = Number(monthStartDay);
-
-        const startDate =
-            startDay === 1
-                ? new Date(year, month - 1, 1)
-                : new Date(year, month - 2, startDay);
-
-        const endDate =
-            startDay === 1
-                ? new Date(year, month, 0)
-                : new Date(year, month - 1, startDay - 1);
-
-        return `${startDate.getMonth() + 1}/${startDate.getDate()}〜${endDate.getMonth() + 1}/${endDate.getDate()}`;
-    })();
+    const period = getAccountingPeriod(
+        selectedMonth,
+        monthStartDay,
+    );
     return (
         <label className="month-filter">
             <span>表示月</span>
@@ -44,7 +30,7 @@ function MonthFilter({
                     onMonthChange(event.target.value)
                 }
             />
-            {periodText && <span>対象期間：{periodText}</span>}
+            {period && <span>対象期間：{period.label}</span>}
         </label>
     );
 }
