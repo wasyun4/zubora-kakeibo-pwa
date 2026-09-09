@@ -24,11 +24,23 @@ main {
 }
 
 section {
-  margin-bottom: 1rem;
-  padding: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1.25rem;
   background: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+  border: 1px solid #e4ebe7;
+  border-radius: 1rem;
+  box-shadow: 0 4px 14px rgb(25 70 45 / 8%);
+}
+
+section h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+section h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
 }
 
 label {
@@ -436,4 +448,15 @@ li button {
 
 .csv-panel small {
   color: #6b756f;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

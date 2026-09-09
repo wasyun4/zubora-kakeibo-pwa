@@ -466,8 +466,7 @@ function App() {
   // 【画面コンポーネントの組み立て】
   return (
     <main>
-      <h1>家計簿アプリ</h1>
-      <p>ここから少しずつ作っていきます。</p>
+      <h1 className="visually-hidden">家計簿アプリ</h1>
 
       <MonthFilter
         selectedMonth={selectedMonth}
