@@ -6,6 +6,7 @@ type SettingsPanelProps = {
     onMonthStartDayChange: (value: string) => void;
     onSave: () => void;
     onBackup: () => void;
+    onRestore: (file: File) => void;
 };
 
 function SettingsPanel({
@@ -13,6 +14,7 @@ function SettingsPanel({
     onMonthStartDayChange,
     onSave,
     onBackup,
+    onRestore,
 }: SettingsPanelProps) {
     return (
         <section>
@@ -54,12 +56,24 @@ function SettingsPanel({
                         バックアップ
                     </button>
 
-                    <button type="button" disabled>
+                    <label className="restore-file-button">
                         復元
-                    </button>
-                </div>
 
-                <small>復元機能は現在準備中です。</small>
+                        <input
+                            type="file"
+                            accept=".json,application/json"
+                            onChange={(event) => {
+                                const file = event.target.files?.[0];
+
+                                if (file) {
+                                    onRestore(file);
+                                }
+
+                                event.target.value = "";
+                            }}
+                        />
+                    </label>
+                </div>
             </div>
         </section>
     );

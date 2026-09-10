@@ -23,8 +23,10 @@ import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 import SettingsPanel from "./components/SettingsPanel";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
-import { downloadBackup } from "./utils/backup";
-
+import {
+  downloadBackup,
+  restoreBackup,
+} from "./utils/backup";
 function App() {
   // 【収入・支出の大カテゴリ抽出】
   const incomeCategories = initialCategories.filter(
@@ -358,6 +360,22 @@ function App() {
     alert(`月初め日を${startDay}日に設定しました！`);
   }
 
+  // 【バックアップファイルからの復元】
+  async function handleRestoreBackup(file: File) {
+    try {
+      const restored = await restoreBackup(file);
+
+      if (!restored) {
+        return;
+      }
+
+      alert("バックアップから復元しました！");
+      window.location.reload();
+    } catch {
+      alert("バックアップファイルを読み込めませんでした。");
+    }
+  }
+
   // 【収支入力フォームの初期化】
   function resetForm() {
     setAmount("");
@@ -603,6 +621,7 @@ function App() {
             onMonthStartDayChange={setMonthStartDay}
             onSave={handleSaveMonthStartDay}
             onBackup={downloadBackup}
+            onRestore={handleRestoreBackup}
           />
 
           <CsvPanel />

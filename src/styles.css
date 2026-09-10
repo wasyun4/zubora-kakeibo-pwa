@@ -460,3 +460,26 @@ li button {
   white-space: nowrap;
   border: 0;
 }
+
+.restore-file-button {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  margin: 0.25rem 0 0;
+  padding: 0.5rem 0.75rem;
+  color: white;
+  font-weight: bold;
+  background: #2e7d32;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.restore-file-button:hover {
+  background: #1b5e20;
+}
+
+.restore-file-button input {
+  display: none;
+}
