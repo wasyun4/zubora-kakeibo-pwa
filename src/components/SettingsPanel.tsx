@@ -5,12 +5,14 @@ type SettingsPanelProps = {
     monthStartDay: string;
     onMonthStartDayChange: (value: string) => void;
     onSave: () => void;
+    onBackup: () => void;
 };
 
 function SettingsPanel({
     monthStartDay,
     onMonthStartDayChange,
     onSave,
+    onBackup,
 }: SettingsPanelProps) {
     return (
         <section>
@@ -48,7 +50,7 @@ function SettingsPanel({
                 </p>
 
                 <div className="settings-backup-actions">
-                    <button type="button" disabled>
+                    <button type="button" onClick={onBackup}>
                         バックアップ
                     </button>
 
@@ -57,7 +59,7 @@ function SettingsPanel({
                     </button>
                 </div>
 
-                <small>この機能は現在準備中です。</small>
+                <small>復元機能は現在準備中です。</small>
             </div>
         </section>
     );

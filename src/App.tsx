@@ -23,6 +23,7 @@ import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 import SettingsPanel from "./components/SettingsPanel";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
+import { downloadBackup } from "./utils/backup";
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -601,6 +602,7 @@ function App() {
             monthStartDay={monthStartDay}
             onMonthStartDayChange={setMonthStartDay}
             onSave={handleSaveMonthStartDay}
+            onBackup={downloadBackup}
           />
 
           <CsvPanel />
