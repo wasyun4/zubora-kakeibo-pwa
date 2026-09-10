@@ -461,7 +461,7 @@ li button {
   border: 0;
 }
 
-.restore-file-button {
+.file-select-button {
   display: flex;
   flex: 1;
   align-items: center;
@@ -476,10 +476,10 @@ li button {
   cursor: pointer;
 }
 
-.restore-file-button:hover {
+.file-select-button:hover {
   background: #1b5e20;
 }
 
-.restore-file-button input {
+.file-select-button input {
   display: none;
 }

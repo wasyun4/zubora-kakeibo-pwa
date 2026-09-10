@@ -28,6 +28,7 @@ import {
   restoreBackup,
 } from "./utils/backup";
 import { downloadTransactionsCsv } from "./utils/csv";
+import { readTransactionsCsv } from "./utils/csvImport";
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -378,6 +379,43 @@ function App() {
     }
   }
 
+  // 【CSVファイルからの収支取り込み】
+  async function handleImportCsv(file: File) {
+    try {
+      const importedTransactions =
+        await readTransactionsCsv(file);
+
+      if (importedTransactions.length === 0) {
+        alert("取り込める収支データがありません。");
+        return;
+      }
+
+      const shouldImport = window.confirm(
+        `${importedTransactions.length}件の収支を追加します。よろしいですか？`,
+      );
+
+      if (!shouldImport) {
+        return;
+      }
+
+      setExpenses((currentExpenses) => [
+        ...currentExpenses,
+        ...importedTransactions,
+      ]);
+
+      alert(
+        `${importedTransactions.length}件の収支を取り込みました！`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "CSVファイルを読み込めませんでした。";
+
+      alert(message);
+    }
+  }
+
   // 【収支入力フォームの初期化】
   function resetForm() {
     setAmount("");
@@ -628,6 +666,7 @@ function App() {
 
           <CsvPanel
             onExport={() => downloadTransactionsCsv(expenses)}
+            onImport={handleImportCsv}
           />
         </>
       )}

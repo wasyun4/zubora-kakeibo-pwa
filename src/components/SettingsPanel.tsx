@@ -56,7 +56,7 @@ function SettingsPanel({
                         バックアップ
                     </button>
 
-                    <label className="restore-file-button">
+                    <label className="file-select-button">
                         復元
 
                         <input
