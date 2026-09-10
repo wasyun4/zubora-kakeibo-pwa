@@ -1,7 +1,12 @@
 // 【CSV入出力】
 // 収支データをCSVファイルで出力・入力するための操作エリアです。
+type CsvPanelProps = {
+    onExport: () => void;
+};
 
-function CsvPanel() {
+function CsvPanel({
+    onExport,
+}: CsvPanelProps) {
     return (
         <section className="csv-panel">
             <h2>CSV入出力</h2>
@@ -12,7 +17,7 @@ function CsvPanel() {
             </p>
 
             <div className="csv-panel-actions">
-                <button type="button" disabled>
+                <button type="button" onClick={onExport}>
                     CSV出力
                 </button>
 
@@ -21,7 +26,7 @@ function CsvPanel() {
                 </button>
             </div>
 
-            <small>この機能は現在準備中です。</small>
+            <small>CSV入力機能は現在準備中です。</small>
         </section>
     );
 }

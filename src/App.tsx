@@ -27,6 +27,8 @@ import {
   downloadBackup,
   restoreBackup,
 } from "./utils/backup";
+import { downloadTransactionsCsv } from "./utils/csv";
+
 function App() {
   // 【収入・支出の大カテゴリ抽出】
   const incomeCategories = initialCategories.filter(
@@ -624,7 +626,9 @@ function App() {
             onRestore={handleRestoreBackup}
           />
 
-          <CsvPanel />
+          <CsvPanel
+            onExport={() => downloadTransactionsCsv(expenses)}
+          />
         </>
       )}
 
