@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  base: "/zubora-kakeibo-pwa/",
+
   plugins: [
     react(),
     VitePWA({
@@ -17,10 +19,11 @@ export default defineConfig({
         theme_color: "#2e7d32",
         background_color: "#f5f8f6",
         display: "standalone",
-        start_url: "/",
+        start_url: "/zubora-kakeibo-pwa/",
+        scope: "/zubora-kakeibo-pwa/",
         icons: [
           {
-            src: "/app-icon.svg",
+            src: "/zubora-kakeibo-pwa/app-icon.svg",
             sizes: "any",
             type: "image/svg+xml",
             purpose: "any maskable",
