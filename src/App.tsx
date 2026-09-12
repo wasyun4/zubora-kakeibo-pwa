@@ -437,6 +437,11 @@ function App() {
       return;
     }
 
+    if (date === "") {
+      alert("日付を入力してください。");
+      return;
+    }
+
     if (paymentMethodId === "") {
       alert("支払方法を選択してください。");
       return;
