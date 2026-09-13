@@ -6,7 +6,17 @@ import {
     loadMonthlyBudgets,
     loadMonthStartDay,
     loadTransactions,
+    saveCategoryBudgets,
+    saveMonthlyBudgets,
+    saveMonthStartDay,
+    saveTransactions,
 } from "./database";
+
+import type {
+    CategoryBudget,
+    MonthlyBudget,
+    Transaction,
+} from "../types";
 
 export async function downloadBackup() {
     const [
@@ -54,7 +64,7 @@ export async function downloadBackup() {
 }
 
 // 【バックアップファイルからの復元】
-// JSONファイルを確認し、localStorageへ家計簿データを戻します。
+// JSONファイルを確認し、IndexedDBへ家計簿データを戻します。
 
 export async function restoreBackup(file: File) {
     const fileContent = await file.text();
@@ -90,22 +100,16 @@ export async function restoreBackup(file: File) {
         return false;
     }
 
-    localStorage.setItem(
-        "expenses",
-        JSON.stringify(data.expenses),
-    );
-    localStorage.setItem(
-        "monthlyBudgets",
-        JSON.stringify(data.monthlyBudgets),
-    );
-    localStorage.setItem(
-        "categoryBudgets",
-        JSON.stringify(data.categoryBudgets),
-    );
-    localStorage.setItem(
-        "monthStartDay",
-        data.monthStartDay,
-    );
+    await Promise.all([
+        saveTransactions(data.expenses as Transaction[]),
+        saveMonthlyBudgets(
+            data.monthlyBudgets as MonthlyBudget[],
+        ),
+        saveCategoryBudgets(
+            data.categoryBudgets as CategoryBudget[],
+        ),
+        saveMonthStartDay(data.monthStartDay),
+    ]);
 
     return true;
 }
