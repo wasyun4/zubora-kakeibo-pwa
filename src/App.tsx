@@ -29,6 +29,10 @@ import {
 } from "./utils/backup";
 import { downloadTransactionsCsv } from "./utils/csv";
 import { readTransactionsCsv } from "./utils/csvImport";
+import {
+  loadTransactions,
+  saveTransactions,
+} from "./utils/database";
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -99,26 +103,29 @@ function App() {
   );
 
   // 【収支履歴の読み込みと状態管理】
-  const [expenses, setExpenses] = useState<Transaction[]>(() => {
-    const savedExpenses = localStorage.getItem("expenses");
+  const [expenses, setExpenses] = useState<Transaction[]>([]);
+  const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
 
-    const parsedExpenses = savedExpenses
-      ? JSON.parse(savedExpenses)
-      : [];
-
-    return parsedExpenses.map((expense: Transaction) => ({
-      ...expense,
-      id: expense.id || crypto.randomUUID(),
-    }));
-  });
-
-  // 【収支履歴のlocalStorage保存】
+  // 【IndexedDBから収支履歴を読み込む】
   useEffect(() => {
-    localStorage.setItem(
-      "expenses",
-      JSON.stringify(expenses),
-    );
-  }, [expenses]);
+    async function fetchTransactions() {
+      const savedTransactions = await loadTransactions();
+
+      setExpenses(savedTransactions);
+      setIsDatabaseLoaded(true);
+    }
+
+    void fetchTransactions();
+  }, []);
+
+  // 【収支履歴をIndexedDBへ保存する】
+  useEffect(() => {
+    if (!isDatabaseLoaded) {
+      return;
+    }
+
+    void saveTransactions(expenses);
+  }, [expenses, isDatabaseLoaded]);
 
   // 【月予算のlocalStorage保存】
   useEffect(() => {
