@@ -30,7 +30,9 @@ import {
 import { downloadTransactionsCsv } from "./utils/csv";
 import { readTransactionsCsv } from "./utils/csvImport";
 import {
+  loadMonthlyBudgets,
   loadTransactions,
+  saveMonthlyBudgets,
   saveTransactions,
 } from "./utils/database";
 
@@ -75,12 +77,10 @@ function App() {
   // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
   const [monthlyBudgets, setMonthlyBudgets] =
-    useState<MonthlyBudget[]>(() => {
-      const savedBudgets =
-        localStorage.getItem("monthlyBudgets");
+    useState<MonthlyBudget[]>([]);
+  const [areMonthlyBudgetsLoaded, setAreMonthlyBudgetsLoaded] =
+    useState(false);
 
-      return savedBudgets ? JSON.parse(savedBudgets) : [];
-    });
   // 【カテゴリ別予算データ管理】
   const [categoryBudgets, setCategoryBudgets] =
     useState<CategoryBudget[]>(() => {
@@ -127,13 +127,26 @@ function App() {
     void saveTransactions(expenses);
   }, [expenses, isDatabaseLoaded]);
 
-  // 【月予算のlocalStorage保存】
+  // 【IndexedDBから月予算を読み込む】
   useEffect(() => {
-    localStorage.setItem(
-      "monthlyBudgets",
-      JSON.stringify(monthlyBudgets),
-    );
-  }, [monthlyBudgets]);
+    async function fetchMonthlyBudgets() {
+      const savedMonthlyBudgets = await loadMonthlyBudgets();
+
+      setMonthlyBudgets(savedMonthlyBudgets);
+      setAreMonthlyBudgetsLoaded(true);
+    }
+
+    void fetchMonthlyBudgets();
+  }, []);
+
+  // 【月予算をIndexedDBへ保存する】
+  useEffect(() => {
+    if (!areMonthlyBudgetsLoaded) {
+      return;
+    }
+
+    void saveMonthlyBudgets(monthlyBudgets);
+  }, [monthlyBudgets, areMonthlyBudgetsLoaded]);
 
   // 【選択月の予算を入力欄へ反映】
   useEffect(() => {
