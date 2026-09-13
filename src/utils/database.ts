@@ -123,3 +123,19 @@ export async function saveCategoryBudgets(
 
     await databaseTransaction.done;
 }
+
+// 【月初め日の読み込み】
+export async function loadMonthStartDay() {
+    const database = await databasePromise;
+    return database.get("settings", "monthStartDay");
+}
+
+// 【月初め日の保存】
+export async function saveMonthStartDay(monthStartDay: string) {
+    const database = await databasePromise;
+    await database.put(
+        "settings",
+        monthStartDay,
+        "monthStartDay",
+    );
+}
