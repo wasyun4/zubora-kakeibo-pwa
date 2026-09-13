@@ -48,3 +48,28 @@ export const databasePromise = openDB<KakeiboDatabase>(
         },
     },
 );
+
+// 【収支履歴の読み込み】
+export async function loadTransactions() {
+    const database = await databasePromise;
+    return database.getAll("transactions");
+}
+
+// 【収支履歴の保存】
+export async function saveTransactions(
+    transactions: Transaction[],
+) {
+    const database = await databasePromise;
+    const databaseTransaction = database.transaction(
+        "transactions",
+        "readwrite",
+    );
+
+    await databaseTransaction.store.clear();
+
+    for (const transaction of transactions) {
+        await databaseTransaction.store.put(transaction);
+    }
+
+    await databaseTransaction.done;
+}
