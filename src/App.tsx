@@ -278,7 +278,7 @@ function App() {
   const remainingBudget =
     selectedBudget === undefined
       ? null
-      : selectedBudget.amount - expenseTotal;
+      : selectedBudget.amount - expenseTotal - savingsTotal;
 
   // 【月全体の予算保存】
   function handleSaveBudget() {
