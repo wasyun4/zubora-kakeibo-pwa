@@ -1,22 +1,34 @@
 // 【バックアップファイルの作成】
-// localStorageの家計簿データをJSONファイルとして保存します。
+// IndexedDBの家計簿データをJSONファイルとして保存します。
 
-export function downloadBackup() {
+import {
+    loadCategoryBudgets,
+    loadMonthlyBudgets,
+    loadMonthStartDay,
+    loadTransactions,
+} from "./database";
+
+export async function downloadBackup() {
+    const [
+        expenses,
+        monthlyBudgets,
+        categoryBudgets,
+        savedMonthStartDay,
+    ] = await Promise.all([
+        loadTransactions(),
+        loadMonthlyBudgets(),
+        loadCategoryBudgets(),
+        loadMonthStartDay(),
+    ]);
+
     const backupData = {
         version: 1,
         exportedAt: new Date().toISOString(),
         data: {
-            expenses: JSON.parse(
-                localStorage.getItem("expenses") ?? "[]",
-            ),
-            monthlyBudgets: JSON.parse(
-                localStorage.getItem("monthlyBudgets") ?? "[]",
-            ),
-            categoryBudgets: JSON.parse(
-                localStorage.getItem("categoryBudgets") ?? "[]",
-            ),
-            monthStartDay:
-                localStorage.getItem("monthStartDay") ?? "1",
+            expenses,
+            monthlyBudgets,
+            categoryBudgets,
+            monthStartDay: savedMonthStartDay ?? "1",
         },
     };
 
