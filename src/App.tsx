@@ -30,8 +30,10 @@ import {
 import { downloadTransactionsCsv } from "./utils/csv";
 import { readTransactionsCsv } from "./utils/csvImport";
 import {
+  loadCategoryBudgets,
   loadMonthlyBudgets,
   loadTransactions,
+  saveCategoryBudgets,
   saveMonthlyBudgets,
   saveTransactions,
 } from "./utils/database";
@@ -74,6 +76,7 @@ function App() {
   const [monthStartDay, setMonthStartDay] = useState(
     () => localStorage.getItem("monthStartDay") ?? "1",
   );
+
   // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
   const [monthlyBudgets, setMonthlyBudgets] =
@@ -83,14 +86,10 @@ function App() {
 
   // 【カテゴリ別予算データ管理】
   const [categoryBudgets, setCategoryBudgets] =
-    useState<CategoryBudget[]>(() => {
-      const savedCategoryBudgets =
-        localStorage.getItem("categoryBudgets");
+    useState<CategoryBudget[]>([]);
+  const [areCategoryBudgetsLoaded, setAreCategoryBudgetsLoaded] =
+    useState(false);
 
-      return savedCategoryBudgets
-        ? JSON.parse(savedCategoryBudgets)
-        : [];
-    });
   // 【店舗・収入元の状態管理】
   const [source, setSource] = useState("");
 
@@ -159,13 +158,26 @@ function App() {
     );
   }, [selectedMonth, monthlyBudgets]);
 
-  // 【カテゴリ別予算のlocalStorage保存】
+  // 【IndexedDBからカテゴリ予算を読み込む】
   useEffect(() => {
-    localStorage.setItem(
-      "categoryBudgets",
-      JSON.stringify(categoryBudgets),
-    );
-  }, [categoryBudgets]);
+    async function fetchCategoryBudgets() {
+      const savedCategoryBudgets = await loadCategoryBudgets();
+
+      setCategoryBudgets(savedCategoryBudgets);
+      setAreCategoryBudgetsLoaded(true);
+    }
+
+    void fetchCategoryBudgets();
+  }, []);
+
+  // 【カテゴリ予算をIndexedDBへ保存する】
+  useEffect(() => {
+    if (!areCategoryBudgetsLoaded) {
+      return;
+    }
+
+    void saveCategoryBudgets(categoryBudgets);
+  }, [categoryBudgets, areCategoryBudgetsLoaded]);
 
   // 【選択した表示月の集計期間】
   const accountingPeriod = getAccountingPeriod(
