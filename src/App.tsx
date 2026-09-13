@@ -32,9 +32,11 @@ import { readTransactionsCsv } from "./utils/csvImport";
 import {
   loadCategoryBudgets,
   loadMonthlyBudgets,
+  loadMonthStartDay,
   loadTransactions,
   saveCategoryBudgets,
   saveMonthlyBudgets,
+  saveMonthStartDay,
   saveTransactions,
 } from "./utils/database";
 
@@ -73,9 +75,7 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState("");
 
   // 【月初め日の設定管理】
-  const [monthStartDay, setMonthStartDay] = useState(
-    () => localStorage.getItem("monthStartDay") ?? "1",
-  );
+  const [monthStartDay, setMonthStartDay] = useState("1");
 
   // 【月全体の予算データ管理】
   const [budgetAmount, setBudgetAmount] = useState("");
@@ -104,6 +104,16 @@ function App() {
   // 【収支履歴の読み込みと状態管理】
   const [expenses, setExpenses] = useState<Transaction[]>([]);
   const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
+
+  // 【IndexedDBから月初め日を読み込む】
+  useEffect(() => {
+    async function fetchMonthStartDay() {
+      const savedMonthStartDay = await loadMonthStartDay();
+      setMonthStartDay(savedMonthStartDay ?? "1");
+    }
+
+    void fetchMonthStartDay();
+  }, []);
 
   // 【IndexedDBから収支履歴を読み込む】
   useEffect(() => {
@@ -378,7 +388,7 @@ function App() {
   }
 
   // 【月初め日の保存】
-  function handleSaveMonthStartDay() {
+  async function handleSaveMonthStartDay() {
     const startDay = Number(monthStartDay);
 
     if (startDay < 1 || startDay > 28) {
@@ -386,10 +396,7 @@ function App() {
       return;
     }
 
-    localStorage.setItem(
-      "monthStartDay",
-      String(startDay),
-    );
+    await saveMonthStartDay(String(startDay));
 
     setMonthStartDay(String(startDay));
     alert(`月初め日を${startDay}日に設定しました！`);
