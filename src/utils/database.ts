@@ -73,3 +73,28 @@ export async function saveTransactions(
 
     await databaseTransaction.done;
 }
+
+// 【月予算の読み込み】
+export async function loadMonthlyBudgets() {
+    const database = await databasePromise;
+    return database.getAll("monthlyBudgets");
+}
+
+// 【月予算の保存】
+export async function saveMonthlyBudgets(
+    monthlyBudgets: MonthlyBudget[],
+) {
+    const database = await databasePromise;
+    const databaseTransaction = database.transaction(
+        "monthlyBudgets",
+        "readwrite",
+    );
+
+    await databaseTransaction.store.clear();
+
+    for (const monthlyBudget of monthlyBudgets) {
+        await databaseTransaction.store.put(monthlyBudget);
+    }
+
+    await databaseTransaction.done;
+}
