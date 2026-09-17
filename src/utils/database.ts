@@ -6,7 +6,9 @@ import type {
     CategoryBudget,
     MonthlyBudget,
     Transaction,
+    WalletData,
 } from "../types";
+import { emptyWalletData, walletIds } from "./wallets";
 
 interface KakeiboDatabase extends DBSchema {
     transactions: {
@@ -138,4 +140,33 @@ export async function saveMonthStartDay(monthStartDay: string) {
         monthStartDay,
         "monthStartDay",
     );
+}
+
+// 【ウォレット設定と資金移動】
+export async function loadWalletData(): Promise<WalletData> {
+    const database = await databasePromise;
+    const saved = await database.get("settings", "walletData");
+    if (!saved) return emptyWalletData;
+
+    try {
+        const parsed = JSON.parse(saved) as Partial<WalletData>;
+        const openingBalances = { ...emptyWalletData.openingBalances };
+        for (const id of walletIds) {
+            const amount = parsed.openingBalances?.[id];
+            if (typeof amount === "number" && Number.isFinite(amount) && amount >= 0) {
+                openingBalances[id] = amount;
+            }
+        }
+        return {
+            openingBalances,
+            transfers: Array.isArray(parsed.transfers) ? parsed.transfers : [],
+        };
+    } catch {
+        return emptyWalletData;
+    }
+}
+
+export async function saveWalletData(data: WalletData) {
+    const database = await databasePromise;
+    await database.put("settings", JSON.stringify(data), "walletData");
 }

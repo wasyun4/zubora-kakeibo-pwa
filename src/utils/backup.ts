@@ -6,16 +6,20 @@ import {
     loadMonthlyBudgets,
     loadMonthStartDay,
     loadTransactions,
+    loadWalletData,
     saveCategoryBudgets,
     saveMonthlyBudgets,
     saveMonthStartDay,
     saveTransactions,
+    saveWalletData,
 } from "./database";
+import { emptyWalletData, walletIds } from "./wallets";
 
 import type {
     CategoryBudget,
     MonthlyBudget,
     Transaction,
+    WalletData,
 } from "../types";
 
 export async function downloadBackup() {
@@ -24,11 +28,13 @@ export async function downloadBackup() {
         monthlyBudgets,
         categoryBudgets,
         savedMonthStartDay,
+        walletData,
     ] = await Promise.all([
         loadTransactions(),
         loadMonthlyBudgets(),
         loadCategoryBudgets(),
         loadMonthStartDay(),
+        loadWalletData(),
     ]);
 
     const backupData = {
@@ -39,6 +45,7 @@ export async function downloadBackup() {
             monthlyBudgets,
             categoryBudgets,
             monthStartDay: savedMonthStartDay ?? "1",
+            walletData,
         },
     };
 
@@ -76,6 +83,7 @@ export async function restoreBackup(file: File) {
             monthlyBudgets?: unknown[];
             categoryBudgets?: unknown[];
             monthStartDay?: string;
+            walletData?: unknown;
         };
     };
 
@@ -100,6 +108,23 @@ export async function restoreBackup(file: File) {
         return false;
     }
 
+    let walletData: WalletData = emptyWalletData;
+    if (data.walletData !== undefined) {
+        const candidate = data.walletData as Partial<WalletData>;
+        if (!candidate || typeof candidate !== "object" ||
+            !candidate.openingBalances || !Array.isArray(candidate.transfers) ||
+            walletIds.some((id) => typeof candidate.openingBalances?.[id] !== "number" ||
+                !Number.isFinite(candidate.openingBalances[id]) || candidate.openingBalances[id] < 0) ||
+            candidate.transfers.some((transfer) =>
+                !transfer || typeof transfer.id !== "string" || typeof transfer.date !== "string" ||
+                !walletIds.includes(transfer.from) || !walletIds.includes(transfer.to) ||
+                transfer.from === "creditCard" || transfer.from === transfer.to ||
+                typeof transfer.amount !== "number" || !Number.isFinite(transfer.amount) || transfer.amount <= 0)) {
+            throw new Error("ウォレットデータを読み込めません。");
+        }
+        walletData = candidate as WalletData;
+    }
+
     await Promise.all([
         saveTransactions(data.expenses as Transaction[]),
         saveMonthlyBudgets(
@@ -109,6 +134,7 @@ export async function restoreBackup(file: File) {
             data.categoryBudgets as CategoryBudget[],
         ),
         saveMonthStartDay(data.monthStartDay),
+        saveWalletData(walletData),
     ]);
 
     return true;

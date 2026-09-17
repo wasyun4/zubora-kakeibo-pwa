@@ -24,6 +24,21 @@ export type CategoryBudget = {
   amount: number;
 };
 
+export type WalletId = "cash" | "bankAccount" | "digitalPayment" | "creditCard";
+
+export type WalletTransfer = {
+  id: string;
+  date: string;
+  from: WalletId;
+  to: WalletId;
+  amount: number;
+};
+
+export type WalletData = {
+  openingBalances: Record<WalletId, number>;
+  transfers: WalletTransfer[];
+};
+
 export type AppView =
   | "home"
   | "records"

@@ -10,6 +10,7 @@ import type {
   MonthlyBudget,
   Transaction,
   TransactionScope,
+  WalletData,
 } from "./types";
 import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
@@ -21,6 +22,9 @@ import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
 import BottomNavigation from "./components/BottomNavigation";
 import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 import SettingsPanel from "./components/SettingsPanel";
+import WalletPanel from "./components/WalletPanel";
+import WalletSettings from "./components/WalletSettings";
+import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
 import {
@@ -33,10 +37,12 @@ import {
   loadCategoryBudgets,
   loadMonthlyBudgets,
   loadMonthStartDay,
+  loadWalletData,
   loadTransactions,
   saveCategoryBudgets,
   saveMonthlyBudgets,
   saveMonthStartDay,
+  saveWalletData,
   saveTransactions,
 } from "./utils/database";
 
@@ -104,6 +110,20 @@ function App() {
   // 【収支履歴の読み込みと状態管理】
   const [expenses, setExpenses] = useState<Transaction[]>([]);
   const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
+  const [walletData, setWalletData] = useState<WalletData>(emptyWalletData);
+  const [isWalletDataLoaded, setIsWalletDataLoaded] = useState(false);
+
+  useEffect(() => {
+    void loadWalletData().then((saved) => {
+      setWalletData(saved);
+      setIsWalletDataLoaded(true);
+    });
+  }, []);
+
+  async function updateWalletData(next: WalletData) {
+    await saveWalletData(next);
+    setWalletData(next);
+  }
 
   // 【IndexedDBから月初め日を読み込む】
   useEffect(() => {
@@ -311,6 +331,8 @@ function App() {
   // 【使える残り金額の計算】
   const availableBalance =
     incomeTotal - expenseTotal - savingsTotal;
+
+  const walletBalances = calculateWalletBalances(walletData, expenses);
 
   // 【選択月の月予算と残額計算】
   const selectedBudget = monthlyBudgets.find(
@@ -590,6 +612,11 @@ function App() {
             }
           />
 
+          <WalletPanel
+            balances={walletBalances}
+            isLoaded={isWalletDataLoaded && isDatabaseLoaded}
+          />
+
           <MonthlyBudgetPanel
             selectedMonth={selectedMonth}
             budgetAmount={budgetAmount}
@@ -707,6 +734,10 @@ function App() {
             onBackup={downloadBackup}
             onRestore={handleRestoreBackup}
           />
+
+          {isWalletDataLoaded && (
+            <WalletSettings data={walletData} onChange={updateWalletData} />
+          )}
 
           <CsvPanel
             onExport={() => downloadTransactionsCsv(expenses)}
