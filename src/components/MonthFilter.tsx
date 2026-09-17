@@ -19,9 +19,7 @@ function MonthFilter({
         monthStartDay,
     );
     return (
-        <label className="month-filter">
-            <span>表示月</span>
-
+        <div className="month-filter">
             <input
                 type="month"
                 aria-label="表示する月"
@@ -30,8 +28,12 @@ function MonthFilter({
                     onMonthChange(event.target.value)
                 }
             />
-            {period && <span>対象期間：{period.label}</span>}
-        </label>
+            {period && (
+                <span className="month-filter-period" aria-live="polite">
+                    対象期間：{period.label}
+                </span>
+            )}
+        </div>
     );
 }
 

@@ -46,6 +46,13 @@ import {
   saveTransactions,
 } from "./utils/database";
 
+function getCurrentMonth() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
 function App() {
   // 【収入・支出の大カテゴリ抽出】
   const incomeCategories = initialCategories.filter(
@@ -78,7 +85,7 @@ function App() {
     useState(false);
   const [activeView, setActiveView] =
     useState<AppView>("home");
-  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth);
 
   // 【月初め日の設定管理】
   const [monthStartDay, setMonthStartDay] = useState("1");
@@ -596,7 +603,7 @@ function App() {
       <MonthFilter
         selectedMonth={selectedMonth}
         monthStartDay={monthStartDay}
-        onMonthChange={setSelectedMonth}
+        onMonthChange={(month) => setSelectedMonth(month || getCurrentMonth())}
       />
 
       {/*ホーム画面*/}
