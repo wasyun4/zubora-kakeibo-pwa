@@ -24,6 +24,7 @@ import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 import SettingsPanel from "./components/SettingsPanel";
 import WalletPanel from "./components/WalletPanel";
 import WalletSettings from "./components/WalletSettings";
+import MobileLayout from "./components/MobileLayout";
 import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
@@ -597,7 +598,7 @@ function App() {
 
   // 【画面コンポーネントの組み立て】
   return (
-    <main>
+    <MobileLayout>
       <h1 className="visually-hidden">家計簿アプリ</h1>
 
       <MonthFilter
@@ -758,7 +759,7 @@ function App() {
         onViewChange={setActiveView}
       />
 
-    </main>
+    </MobileLayout>
   );
 }
 
