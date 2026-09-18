@@ -115,7 +115,8 @@ export async function readTransactionsCsv(file: File) {
         );
 
         const paymentMethod = initialPaymentMethods.find(
-            (method) => method.name === paymentMethodName,
+            (method) => method.name === paymentMethodName ||
+                (paymentMethodName === "銀行口座" && method.id === "bankAccount"),
         );
 
         const lineNumber = index + 2;

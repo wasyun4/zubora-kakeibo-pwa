@@ -113,8 +113,12 @@ export async function restoreBackup(file: File) {
         const candidate = data.walletData as Partial<WalletData>;
         if (!candidate || typeof candidate !== "object" ||
             !candidate.openingBalances || !Array.isArray(candidate.transfers) ||
-            walletIds.some((id) => typeof candidate.openingBalances?.[id] !== "number" ||
-                !Number.isFinite(candidate.openingBalances[id]) || candidate.openingBalances[id] < 0) ||
+            walletIds.some((id) => {
+                const amount = candidate.openingBalances?.[id];
+                // りそな追加前のバックアップには、この開始額がありません。
+                if (id === "bankAccountRisona" && amount === undefined) return false;
+                return typeof amount !== "number" || !Number.isFinite(amount) || amount < 0;
+            }) ||
             candidate.transfers.some((transfer) =>
                 !transfer || typeof transfer.id !== "string" || typeof transfer.date !== "string" ||
                 !walletIds.includes(transfer.from) || !walletIds.includes(transfer.to) ||
@@ -122,7 +126,13 @@ export async function restoreBackup(file: File) {
                 typeof transfer.amount !== "number" || !Number.isFinite(transfer.amount) || transfer.amount <= 0)) {
             throw new Error("ウォレットデータを読み込めません。");
         }
-        walletData = candidate as WalletData;
+        walletData = {
+            openingBalances: {
+                ...emptyWalletData.openingBalances,
+                ...candidate.openingBalances,
+            },
+            transfers: candidate.transfers,
+        };
     }
 
     await Promise.all([

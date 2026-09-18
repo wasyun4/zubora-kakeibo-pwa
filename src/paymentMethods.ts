@@ -22,7 +22,12 @@ export const initialPaymentMethods: PaymentMethod[] = [
   },
   {
     id: "bankAccount",
-    name: "銀行口座",
+    name: "福銀",
+    isActive: true,
+  },
+  {
+    id: "bankAccountRisona",
+    name: "りそな",
     isActive: true,
   },
   {

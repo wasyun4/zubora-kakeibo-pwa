@@ -24,7 +24,7 @@ export type CategoryBudget = {
   amount: number;
 };
 
-export type WalletId = "cash" | "bankAccount" | "digitalPayment" | "creditCard";
+export type WalletId = "cash" | "bankAccount" | "bankAccountRisona" | "digitalPayment" | "creditCard";
 
 export type WalletTransfer = {
   id: string;

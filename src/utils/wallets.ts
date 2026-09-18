@@ -3,12 +3,13 @@
 import type { Transaction, WalletData, WalletId } from "../types";
 
 export const walletIds: WalletId[] = [
-  "cash", "bankAccount", "digitalPayment", "creditCard",
+  "cash", "bankAccount", "bankAccountRisona", "digitalPayment", "creditCard",
 ];
 
 export const walletNames: Record<WalletId, string> = {
   cash: "現金",
-  bankAccount: "銀行口座",
+  bankAccount: "福銀",
+  bankAccountRisona: "りそな",
   digitalPayment: "QR・電子マネー",
   creditCard: "クレカ未払い",
 };
@@ -17,6 +18,7 @@ export const emptyWalletData: WalletData = {
   openingBalances: {
     cash: 0,
     bankAccount: 0,
+    bankAccountRisona: 0,
     digitalPayment: 0,
     creditCard: 0,
   },
