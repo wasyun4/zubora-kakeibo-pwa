@@ -18,7 +18,6 @@ import TransactionList from "./components/TransactionList";
 import TransactionForm from "./components/TransactionForm";
 import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
 import CategoryBudgetPanel from "./components/CategoryBudgetPanel";
-import BottomNavigation from "./components/BottomNavigation";
 import CategoryBudgetComparison from "./components/CategoryBudgetComparison";
 import SettingsPanel from "./components/SettingsPanel";
 import WalletPanel from "./components/WalletPanel";
@@ -601,6 +600,8 @@ function App() {
       selectedMonth={selectedMonth}
       monthStartDay={monthStartDay}
       onMonthChange={(month) => setSelectedMonth(month || getCurrentMonth())}
+      activeView={activeView}
+      onViewChange={setActiveView}
     >
 
       {/*ホーム画面*/}
@@ -749,11 +750,6 @@ function App() {
           />
         </>
       )}
-
-      <BottomNavigation
-        activeView={activeView}
-        onViewChange={setActiveView}
-      />
 
     </MobileLayout>
   );
