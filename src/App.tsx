@@ -14,7 +14,6 @@ import type {
 } from "./types";
 import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
-import MonthFilter from "./components/MonthFilter";
 import TransactionList from "./components/TransactionList";
 import TransactionForm from "./components/TransactionForm";
 import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
@@ -598,14 +597,11 @@ function App() {
 
   // 【画面コンポーネントの組み立て】
   return (
-    <MobileLayout>
-      <h1 className="visually-hidden">家計簿アプリ</h1>
-
-      <MonthFilter
-        selectedMonth={selectedMonth}
-        monthStartDay={monthStartDay}
-        onMonthChange={(month) => setSelectedMonth(month || getCurrentMonth())}
-      />
+    <MobileLayout
+      selectedMonth={selectedMonth}
+      monthStartDay={monthStartDay}
+      onMonthChange={(month) => setSelectedMonth(month || getCurrentMonth())}
+    >
 
       {/*ホーム画面*/}
       {activeView === "home" &&
