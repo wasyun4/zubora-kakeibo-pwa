@@ -32,6 +32,7 @@ function CategoryBudgetPanel({
             selectedMonth === "" ||
             categoryId === "" ||
             amount === "" ||
+            !Number.isFinite(Number(amount)) ||
             Number(amount) <= 0
         ) {
             alert("月・カテゴリ・予算金額を入力してください。");

@@ -7,7 +7,6 @@ import { initialPaymentMethods } from "./paymentMethods";
 import type {
   AppView,
   CategoryBudget,
-  MonthlyBudget,
   Transaction,
   TransactionScope,
   WalletData,
@@ -27,6 +26,7 @@ import TransactionDialog from "./components/TransactionDialog";
 import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
+import { calculateMonthlyBudget } from "./utils/budgets";
 import {
   downloadBackup,
   restoreBackup,
@@ -35,12 +35,10 @@ import { downloadTransactionsCsv } from "./utils/csv";
 import { readTransactionsCsv } from "./utils/csvImport";
 import {
   loadCategoryBudgets,
-  loadMonthlyBudgets,
   loadMonthStartDay,
   loadWalletData,
   loadTransactions,
   saveCategoryBudgets,
-  saveMonthlyBudgets,
   saveMonthStartDay,
   saveWalletData,
   saveTransactions,
@@ -89,13 +87,6 @@ function App() {
 
   // 【月初め日の設定管理】
   const [monthStartDay, setMonthStartDay] = useState("1");
-
-  // 【月全体の予算データ管理】
-  const [budgetAmount, setBudgetAmount] = useState("");
-  const [monthlyBudgets, setMonthlyBudgets] =
-    useState<MonthlyBudget[]>([]);
-  const [areMonthlyBudgetsLoaded, setAreMonthlyBudgetsLoaded] =
-    useState(false);
 
   // 【カテゴリ別予算データ管理】
   const [categoryBudgets, setCategoryBudgets] =
@@ -162,38 +153,6 @@ function App() {
 
     void saveTransactions(expenses);
   }, [expenses, isDatabaseLoaded]);
-
-  // 【IndexedDBから月予算を読み込む】
-  useEffect(() => {
-    async function fetchMonthlyBudgets() {
-      const savedMonthlyBudgets = await loadMonthlyBudgets();
-
-      setMonthlyBudgets(savedMonthlyBudgets);
-      setAreMonthlyBudgetsLoaded(true);
-    }
-
-    void fetchMonthlyBudgets();
-  }, []);
-
-  // 【月予算をIndexedDBへ保存する】
-  useEffect(() => {
-    if (!areMonthlyBudgetsLoaded) {
-      return;
-    }
-
-    void saveMonthlyBudgets(monthlyBudgets);
-  }, [monthlyBudgets, areMonthlyBudgetsLoaded]);
-
-  // 【選択月の予算を入力欄へ反映】
-  useEffect(() => {
-    const savedBudget = monthlyBudgets.find(
-      (budget) => budget.month === selectedMonth,
-    );
-
-    setBudgetAmount(
-      savedBudget ? String(savedBudget.amount) : "",
-    );
-  }, [selectedMonth, monthlyBudgets]);
 
   // 【IndexedDBからカテゴリ予算を読み込む】
   useEffect(() => {
@@ -324,7 +283,7 @@ function App() {
         (item) => item.id === budget.majorCategoryId,
       );
 
-      const spent = categoryTotal?.total ?? 0;
+      const spent = budget.majorCategoryId === "savings" ? savingsTotal : categoryTotal?.total ?? 0;
 
       return {
         id: budget.majorCategoryId,
@@ -341,49 +300,9 @@ function App() {
 
   const walletBalances = calculateWalletBalances(walletData, expenses);
 
-  // 【選択月の月予算と残額計算】
-  const selectedBudget = monthlyBudgets.find(
-    (budget) => budget.month === selectedMonth,
-  );
-
-  const remainingBudget =
-    selectedBudget === undefined
-      ? null
-      : selectedBudget.amount - expenseTotal - savingsTotal;
-
-  // 【月全体の予算保存】
-  function handleSaveBudget() {
-    if (selectedMonth === "") {
-      alert("予算を設定する月を選択してください。");
-      return;
-    }
-
-    if (budgetAmount === "" || Number(budgetAmount) <= 0) {
-      alert("1円以上の予算を入力してください。");
-      return;
-    }
-
-    const newBudget: MonthlyBudget = {
-      month: selectedMonth,
-      amount: Number(budgetAmount),
-    };
-
-    const alreadyExists = monthlyBudgets.some(
-      (budget) => budget.month === selectedMonth,
-    );
-
-    setMonthlyBudgets(
-      alreadyExists
-        ? monthlyBudgets.map((budget) =>
-          budget.month === selectedMonth
-            ? newBudget
-            : budget,
-        )
-        : [...monthlyBudgets, newBudget],
-    );
-
-    alert(`${selectedMonth}の予算を保存しました！`);
-  }
+  // 月予算は表示月のカテゴリ予算の合計。未設定カテゴリの支出も残額に含める。
+  const { total: monthlyBudgetTotal, remaining: remainingBudget } =
+    calculateMonthlyBudget(categoryBudgets, selectedMonth, expenseTotal, savingsTotal);
 
   // 【カテゴリ別予算の保存】
   function handleSaveCategoryBudget(
@@ -625,12 +544,8 @@ function App() {
 
           <MonthlyBudgetPanel
             selectedMonth={selectedMonth}
-            budgetAmount={budgetAmount}
-            savedBudgetAmount={selectedBudget?.amount ?? null}
+            savedBudgetAmount={monthlyBudgetTotal}
             remainingBudget={remainingBudget}
-            isEditable={false}
-            onBudgetAmountChange={setBudgetAmount}
-            onSave={handleSaveBudget}
           />
 
           <CategoryBudgetComparison
@@ -649,19 +564,13 @@ function App() {
         <>
           <MonthlyBudgetPanel
             selectedMonth={selectedMonth}
-            budgetAmount={budgetAmount}
-            savedBudgetAmount={selectedBudget?.amount ?? null}
+            savedBudgetAmount={monthlyBudgetTotal}
             remainingBudget={remainingBudget}
-            isEditable={true}
-            onBudgetAmountChange={setBudgetAmount}
-            onSave={handleSaveBudget}
           />
 
           <CategoryBudgetPanel
             selectedMonth={selectedMonth}
-            categories={expenseMajorCategories.filter(
-              (category) => category.id !== "savings",
-            )}
+            categories={expenseMajorCategories}
             statuses={categoryBudgetStatuses}
             onSave={handleSaveCategoryBudget}
           />

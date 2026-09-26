@@ -107,6 +107,11 @@ function TransactionList({
                             handleTransactionSelect(transaction.id)
                         }
                     >
+                        <p className="transaction-date">
+                            {transaction.date ? (
+                                <time dateTime={transaction.date}>{transaction.date}</time>
+                            ) : "日付なし"}
+                        </p>
                         <div className="transaction-overview">
                             <div>
                                 <span
@@ -144,7 +149,7 @@ function TransactionList({
                         </p>
 
                         <div className="transaction-details">
-                            <span>{transaction.date || "日付なし"}</span>
+
                             <span>{transaction.source || "収支元なし"}</span>
                             <span>
                                 {getCategoryName(transaction.majorCategoryId)}

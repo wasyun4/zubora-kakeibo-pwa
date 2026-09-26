@@ -350,6 +350,12 @@ li button {
   padding: 1rem;
 }
 
+.transaction-date {
+  margin: 0 0 0.5rem;
+  color: #455a64;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
 .transaction-overview {
   display: flex;
   align-items: center;
