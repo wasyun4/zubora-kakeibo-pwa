@@ -7,9 +7,11 @@ import { initialPaymentMethods } from "./paymentMethods";
 import type {
   AppView,
   CategoryBudget,
+  EntryType,
   Transaction,
   TransactionScope,
   WalletData,
+  WalletId,
 } from "./types";
 import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
@@ -23,6 +25,7 @@ import WalletPanel from "./components/WalletPanel";
 import WalletSettings from "./components/WalletSettings";
 import MobileLayout from "./components/MobileLayout";
 import TransactionDialog from "./components/TransactionDialog";
+import WalletTransferList from "./components/WalletTransferList";
 import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
@@ -68,7 +71,7 @@ function App() {
   );
 
   // 【収支入力フォームの状態管理】
-  const [type, setType] = useState("expense");
+  const [type, setType] = useState<EntryType>("expense");
   const [majorCategoryId, setMajorCategoryId] = useState("");
   const [minorCategoryId, setMinorCategoryId] = useState("");
   const [amount, setAmount] = useState("");
@@ -77,6 +80,8 @@ function App() {
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [scope, setScope] =
     useState<TransactionScope>("personal");
+  const [transferFrom, setTransferFrom] = useState<WalletId>("bankAccount");
+  const [transferTo, setTransferTo] = useState<WalletId>("cash");
   const [editingTransactionId, setEditingTransactionId] =
     useState<string | null>(null);
   const [isTransactionFormOpen, setIsTransactionFormOpen] =
@@ -189,6 +194,16 @@ function App() {
         (expense) =>
           expense.date >= accountingPeriod.start &&
           expense.date <= accountingPeriod.end,
+      );
+
+  // 【表示月による振替履歴の絞り込み】
+  const filteredTransfers =
+    accountingPeriod === null
+      ? walletData.transfers
+      : walletData.transfers.filter(
+        (transfer) =>
+          transfer.date >= accountingPeriod.start &&
+          transfer.date <= accountingPeriod.end,
       );
 
   // 【生活支出合計の計算】
@@ -405,6 +420,7 @@ function App() {
 
   // 【収支入力フォームの初期化】
   function resetForm() {
+    setType("expense");
     setAmount("");
     setMemo("");
     const today = new Date();
@@ -414,8 +430,65 @@ function App() {
     setMinorCategoryId("");
     setPaymentMethodId("");
     setScope("personal");
+    setTransferFrom("bankAccount");
+    setTransferTo("cash");
     setEditingTransactionId(null);
     setIsTransactionFormOpen(false);
+  }
+
+  // 【振替の新規登録】
+  async function handleTransferSubmit() {
+    const numericAmount = Number(amount);
+
+    if (!date || !Number.isFinite(numericAmount) || numericAmount <= 0) {
+      alert("日付と1円以上の金額を入力してください。");
+      return;
+    }
+
+    if (transferFrom === transferTo || transferFrom === "creditCard") {
+      alert("移動元と移動先を確認してください。");
+      return;
+    }
+
+    await updateWalletData({
+      ...walletData,
+      transfers: [
+        ...walletData.transfers,
+        {
+          id: crypto.randomUUID(),
+          date,
+          from: transferFrom,
+          to: transferTo,
+          amount: numericAmount,
+          memo,
+        },
+      ],
+    });
+
+    alert(`${amount}円を振り替えました！`);
+    resetForm();
+  }
+
+  // 【入力の種類に応じた登録処理】
+  async function handleFormSubmit() {
+    if (type === "transfer") {
+      await handleTransferSubmit();
+      return;
+    }
+
+    handleExpenseClick();
+  }
+
+  // 【振替履歴の削除】
+  async function handleDeleteTransfer(id: string) {
+    if (!window.confirm("この振替を削除しますか？")) {
+      return;
+    }
+
+    await updateWalletData({
+      ...walletData,
+      transfers: walletData.transfers.filter((transfer) => transfer.id !== id),
+    });
   }
 
   // 【収支の新規登録・更新】
@@ -502,7 +575,7 @@ function App() {
       return;
     }
 
-    setType(transaction.type);
+    setType(transaction.type === "income" ? "income" : "expense");
     setAmount(transaction.amount);
     setMemo(transaction.memo);
     setDate(transaction.date);
@@ -586,6 +659,10 @@ function App() {
             onEdit={handleEditTransaction}
             onDelete={handleDeleteExpense}
           />
+          <WalletTransferList
+            transfers={filteredTransfers}
+            onDelete={(id) => void handleDeleteTransfer(id)}
+          />
         </>
       )}
 
@@ -613,6 +690,8 @@ function App() {
               source={source}
               paymentMethodId={paymentMethodId}
               scope={scope}
+              transferFrom={transferFrom}
+              transferTo={transferTo}
               editingTransactionId={editingTransactionId}
               incomeCategories={incomeCategories}
               expenseMajorCategories={expenseMajorCategories}
@@ -634,7 +713,9 @@ function App() {
               onSourceChange={setSource}
               onPaymentMethodChange={setPaymentMethodId}
               onScopeChange={setScope}
-              onSubmit={handleExpenseClick}
+              onTransferFromChange={setTransferFrom}
+              onTransferToChange={setTransferTo}
+              onSubmit={() => void handleFormSubmit()}
               onCancel={resetForm}
             />
         </TransactionDialog>

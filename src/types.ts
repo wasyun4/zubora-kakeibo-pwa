@@ -1,5 +1,7 @@
 export type TransactionScope = "personal" | "shared";
 
+export type EntryType = "income" | "expense" | "transfer";
+
 export type Transaction = {
   id: string;
   type: string;
@@ -32,6 +34,7 @@ export type WalletTransfer = {
   from: WalletId;
   to: WalletId;
   amount: number;
+  memo?: string;
 };
 
 export type WalletData = {
