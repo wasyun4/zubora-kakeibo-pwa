@@ -5,6 +5,7 @@ import type { Category } from "../categories";
 import type { PaymentMethod } from "../paymentMethods";
 import type { EntryType, TransactionScope, WalletId } from "../types";
 import { walletIds, walletNames } from "../utils/wallets";
+import ExpenseCategoryPicker from "./ExpenseCategoryPicker";
 
 type TransactionFormProps = {
     type: EntryType;
@@ -39,7 +40,6 @@ type TransactionFormProps = {
 };
 
 function TransactionForm(props: TransactionFormProps) {
-    const categories = props.type === "income" ? props.incomeCategories : props.expenseMajorCategories;
     const isTransfer = props.type === "transfer";
 
     function shiftDate(days: number) {
@@ -73,24 +73,34 @@ function TransactionForm(props: TransactionFormProps) {
             </div>
 
             <div className="entry-date-row">
-                <label>日付<input type="date" value={props.date} onChange={(event) => props.onDateChange(event.target.value)} /></label>
                 <button type="button" aria-label="前日" onClick={() => shiftDate(-1)}>‹</button>
+                <label className="entry-date-field">
+                    <span className="visually-hidden">日付</span>
+                    <input aria-label="日付" type="date" value={props.date} onChange={(event) => props.onDateChange(event.target.value)} />
+                </label>
                 <button type="button" aria-label="翌日" onClick={() => shiftDate(1)}>›</button>
             </div>
 
             {!isTransfer && <div className="entry-fields">
-                <label>{props.type === "income" ? "収入カテゴリ" : "大カテゴリ"}
+                {props.type === "income" && <label>収入カテゴリ
                     <select value={props.majorCategoryId} onChange={(event) => props.onMajorCategoryChange(event.target.value)}>
                         <option value="">選択してください</option>
-                        {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-                    </select>
-                </label>
-                {props.type === "expense" && <label>小カテゴリ
-                    <select disabled={!props.majorCategoryId} value={props.minorCategoryId} onChange={(event) => props.onMinorCategoryChange(event.target.value)}>
-                        <option value="">{props.majorCategoryId ? "選択してください" : "大カテゴリを選択"}</option>
-                        {props.expenseMinorCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                        {props.incomeCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                     </select>
                 </label>}
+                {props.type === "expense" && <div className="entry-category-field">
+                    <span>カテゴリ</span>
+                    <ExpenseCategoryPicker
+                        majorCategories={props.expenseMajorCategories}
+                        minorCategories={props.expenseMinorCategories}
+                        majorCategoryId={props.majorCategoryId}
+                        minorCategoryId={props.minorCategoryId}
+                        onChange={(majorCategoryId, minorCategoryId) => {
+                            props.onMajorCategoryChange(majorCategoryId);
+                            props.onMinorCategoryChange(minorCategoryId);
+                        }}
+                    />
+                </div>}
                 <label>{props.type === "income" ? "収入元" : "お店・場所"}<input type="text" value={props.source} onChange={(event) => props.onSourceChange(event.target.value)} placeholder="任意" /></label>
                 <label>メモ<input type="text" value={props.memo} onChange={(event) => props.onMemoChange(event.target.value)} placeholder="任意" /></label>
             </div>}

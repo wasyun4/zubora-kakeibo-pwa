@@ -102,11 +102,11 @@ function App() {
   // 【店舗・収入元の状態管理】
   const [source, setSource] = useState("");
 
-  // 【選択した大カテゴリに属する小カテゴリ抽出】
+  // 【支出の小カテゴリ抽出】
   const expenseMinorCategories = initialCategories.filter(
     (category) =>
       category.type === "expense" &&
-      category.parentId === majorCategoryId &&
+      category.parentId !== null &&
       category.isActive,
   );
 
