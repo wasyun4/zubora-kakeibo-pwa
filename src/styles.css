@@ -545,3 +545,26 @@ li button {
   border: none;
   box-shadow: none;
 }
+/* 参考画面のコンパクトな項目配置と大きな数字キー */
+.quick-entry { padding: 1rem; }
+.quick-entry-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.quick-entry-header h2 { margin: 0; padding: 0; border: 0; }
+.quick-entry .entry-close { width: 2.75rem; margin: 0; color: #455a64; background: #f0f3f1; font-size: 1.5rem; }
+.entry-types { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; margin: 0.75rem 0; padding: 0.25rem; border-radius: 0.75rem; background: #edf2ef; }
+.entry-types button { margin: 0; color: #455a64; background: transparent; }
+.entry-types button[aria-pressed="true"] { color: white; background: #2e7d32; }
+.entry-date-row { display: grid; grid-template-columns: minmax(0, 1fr) 2.75rem 2.75rem; gap: 0.4rem; align-items: end; margin-bottom: 0.65rem; }
+.quick-entry label { min-width: 0; margin: 0; font-size: 0.8rem; color: #455a64; }
+.quick-entry input, .quick-entry select { min-width: 0; max-width: 100%; font-size: 16px; }
+.entry-date-row button { margin: 0; background: #f2efe7; color: #455a64; font-size: 1.5rem; }
+.entry-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
+.quick-entry .entry-amount { display: block; margin-top: 0.85rem; }
+.entry-amount input { text-align: right; font-size: clamp(1.5rem, 7vw, 2.25rem); font-weight: bold; color: #263238; border: 0; border-bottom: 2px solid #c8e6c9; border-radius: 0; }
+.entry-keypad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3rem; padding: 0.4rem; margin: 0.65rem 0; border-radius: 0.9rem; background: #f4f1e9; }
+.entry-keypad button { min-height: 2.75rem; margin: 0; background: transparent; color: #263238; font-size: 1.5rem; touch-action: manipulation; }
+.entry-keypad button:hover { background: #e6e2d8; }
+.entry-keypad .entry-key-action { font-size: 0.95rem; }
+.entry-payment { margin-bottom: 0.7rem; }
+.entry-actions { position: sticky; bottom: -1rem; display: grid; grid-template-columns: 1fr 2fr; gap: 0.65rem; padding: 0.65rem 0 max(0.65rem, env(safe-area-inset-bottom)); background: white; }
+.entry-actions button { margin: 0; }
+.quick-entry button:focus-visible { outline: 3px solid #1976d2; outline-offset: 2px; }

@@ -407,7 +407,8 @@ function App() {
   function resetForm() {
     setAmount("");
     setMemo("");
-    setDate("");
+    const today = new Date();
+    setDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
     setSource("");
     setMajorCategoryId("");
     setMinorCategoryId("");
