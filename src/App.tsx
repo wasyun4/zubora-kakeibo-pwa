@@ -23,6 +23,7 @@ import SettingsPanel from "./components/SettingsPanel";
 import WalletPanel from "./components/WalletPanel";
 import WalletSettings from "./components/WalletSettings";
 import MobileLayout from "./components/MobileLayout";
+import TransactionDialog from "./components/TransactionDialog";
 import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
 import { getAccountingPeriod } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
@@ -670,7 +671,28 @@ function App() {
       {/*記録画面*/}
       {activeView === "records" && (
         <>
-          {isTransactionFormOpen && (
+          <TransactionList
+            transactions={filteredExpenses}
+            onEdit={handleEditTransaction}
+            onDelete={handleDeleteExpense}
+          />
+        </>
+      )}
+
+      <button
+        type="button"
+        className="floating-add-button"
+        aria-label="収支を登録する"
+        onClick={() => {
+          resetForm();
+          setIsTransactionFormOpen(true);
+        }}
+      >
+        ＋
+      </button>
+
+      {isTransactionFormOpen && (
+        <TransactionDialog onCancel={resetForm}>
             <TransactionForm
               type={type}
               majorCategoryId={majorCategoryId}
@@ -705,30 +727,8 @@ function App() {
               onSubmit={handleExpenseClick}
               onCancel={resetForm}
             />
-          )}
-
-          <TransactionList
-            transactions={filteredExpenses}
-            onEdit={handleEditTransaction}
-            onDelete={handleDeleteExpense}
-          />
-        </>
+        </TransactionDialog>
       )}
-
-      {!isTransactionFormOpen && (
-        <button
-          className="floating-add-button"
-          aria-label="収支を登録する"
-          onClick={() => {
-            setActiveView("records");
-            setIsTransactionFormOpen(true);
-          }}
-        >
-          ＋
-        </button>
-      )}
-
-
       {/* 設定画面 */}
       {activeView === "settings" && (
         <>

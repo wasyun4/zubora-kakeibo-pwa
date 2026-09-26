@@ -513,3 +513,29 @@ li button {
 .file-select-button input {
   display: none;
 }
+
+/* 入力中は背景の画面を保持し、フォーム内だけスクロールする */
+.transaction-dialog {
+  width: min(40rem, calc(100% - 1.5rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #263238;
+  background: white;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 25%);
+}
+
+.transaction-dialog::backdrop {
+  background: rgb(20 35 25 / 50%);
+}
+
+.transaction-dialog > section {
+  margin: 0;
+  border: none;
+  box-shadow: none;
+}

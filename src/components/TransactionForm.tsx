@@ -38,7 +38,7 @@ function TransactionForm(
 ) {
     return (
         <section>
-            <h2>収支入力</h2>
+            <h2 id="transaction-form-title">{props.editingTransactionId === null ? "収支入力" : "収支の編集"}</h2>
 
             <label>
                 種類
