@@ -26,8 +26,11 @@ import WalletPanel from "./components/WalletPanel";
 import WalletSettings from "./components/WalletSettings";
 import MobileLayout from "./components/MobileLayout";
 import TransactionDialog from "./components/TransactionDialog";
-import WalletTransferList from "./components/WalletTransferList";
-import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
+import {
+  calculateWalletBalances,
+  emptyWalletData,
+  getCreditCardPayments,
+} from "./utils/wallets";
 import {
   getAccountingPeriod,
   getCurrentAccountingMonth,
@@ -40,6 +43,7 @@ import {
 } from "./utils/backup";
 import { downloadTransactionsCsv } from "./utils/csv";
 import { readTransactionsCsv } from "./utils/csvImport";
+import { createId } from "./utils/createId";
 import {
   loadCategoryBudgets,
   loadMonthStartDay,
@@ -185,6 +189,8 @@ function App() {
     selectedMonth,
     monthStartDay,
   );
+  const today = new Date();
+  const todayText = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   // 【表示月による収支の絞り込み】
   const filteredExpenses =
@@ -206,8 +212,19 @@ function App() {
           transfer.date <= accountingPeriod.end,
       );
 
+  // 【実績と支払い予定の分離】
+  const realizedExpenses = filteredExpenses.filter(
+    (expense) => expense.date <= todayText,
+  );
+  const scheduledExpenses = filteredExpenses.filter(
+    (expense) =>
+      expense.type === "expense" &&
+      expense.majorCategoryId !== "savings" &&
+      expense.date > todayText,
+  );
+
   // 【生活支出合計の計算】
-  const expenseTotal = filteredExpenses
+  const expenseTotal = realizedExpenses
     .filter(
       (expense) =>
         expense.type === "expense" &&
@@ -231,18 +248,23 @@ function App() {
     );
 
   // 【収入合計の計算】
-  const incomeTotal = filteredExpenses
+  const incomeTotal = realizedExpenses
     .filter((expense) => expense.type === "income")
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
     );
 
+  const scheduledPaymentTotal = scheduledExpenses.reduce(
+    (sum, expense) => sum + Number(expense.amount),
+    0,
+  );
+
   // 【大カテゴリ別支出合計の計算】
   const expenseCategoryTotals = expenseMajorCategories
     .filter((category) => category.id !== "savings")
     .map((category) => {
-      const total = filteredExpenses
+      const total = realizedExpenses
         .filter(
           (expense) =>
             expense.type === "expense" &&
@@ -261,11 +283,25 @@ function App() {
     })
     .filter((category) => category.total > 0);
 
+  // 予算では、実績だけでなく登録済みの支払い予定も使用額に含める。
+  const budgetCategoryTotals = expenseMajorCategories
+    .filter((category) => category.id !== "savings")
+    .map((category) => ({
+      id: category.id,
+      total: filteredExpenses
+        .filter(
+          (expense) =>
+            expense.type === "expense" &&
+            expense.majorCategoryId === category.id,
+        )
+        .reduce((sum, expense) => sum + Number(expense.amount), 0),
+    }));
+
   // 【カテゴリ別の支出実績と予算を結合】
   const categoryBudgetComparisons = expenseMajorCategories
     .filter((category) => category.id !== "savings")
     .map((category) => {
-      const categoryTotal = expenseCategoryTotals.find(
+      const categoryTotal = budgetCategoryTotals.find(
         (item) => item.id === category.id,
       );
 
@@ -294,7 +330,7 @@ function App() {
         (item) => item.id === budget.majorCategoryId,
       );
 
-      const categoryTotal = expenseCategoryTotals.find(
+      const categoryTotal = budgetCategoryTotals.find(
         (item) => item.id === budget.majorCategoryId,
       );
 
@@ -311,13 +347,21 @@ function App() {
 
   // 【使える残り金額の計算】
   const availableBalance =
-    incomeTotal - expenseTotal - savingsTotal;
+    incomeTotal - expenseTotal - scheduledPaymentTotal - savingsTotal;
 
   const walletBalances = calculateWalletBalances(walletData, expenses);
+  const nextCreditCardPayment =
+    getCreditCardPayments(expenses, walletData.creditCardSettings)
+      .find((payment) => payment.date > todayText) ?? null;
 
   // 月予算は表示月のカテゴリ予算の合計。未設定カテゴリの支出も残額に含める。
   const { total: monthlyBudgetTotal, remaining: remainingBudget } =
-    calculateMonthlyBudget(categoryBudgets, selectedMonth, expenseTotal, savingsTotal);
+    calculateMonthlyBudget(
+      categoryBudgets,
+      selectedMonth,
+      expenseTotal + scheduledPaymentTotal,
+      savingsTotal,
+    );
 
   // 【カテゴリ別予算の保存】
   function handleSaveCategoryBudget(
@@ -455,7 +499,7 @@ function App() {
       transfers: [
         ...walletData.transfers,
         {
-          id: crypto.randomUUID(),
+          id: createId(),
           date,
           from: transferFrom,
           to: transferTo,
@@ -537,7 +581,7 @@ function App() {
       setExpenses([
         ...expenses,
         {
-          id: crypto.randomUUID(),
+          id: createId(),
           ...transactionData,
         },
       ]);
@@ -608,6 +652,7 @@ function App() {
           <Summary
             incomeTotal={incomeTotal}
             expenseTotal={expenseTotal}
+            scheduledPaymentTotal={scheduledPaymentTotal}
             savingsTotal={savingsTotal}
             availableBalance={availableBalance}
             isExpenseOverBudget={
@@ -618,6 +663,7 @@ function App() {
           <WalletPanel
             balances={walletBalances}
             isLoaded={isWalletDataLoaded && isDatabaseLoaded}
+            nextCreditCardPayment={nextCreditCardPayment}
           />
 
           <MonthlyBudgetPanel
@@ -668,12 +714,10 @@ function App() {
         <>
           <TransactionList
             transactions={filteredExpenses}
+            transfers={filteredTransfers}
             onEdit={handleEditTransaction}
             onDelete={handleDeleteExpense}
-          />
-          <WalletTransferList
-            transfers={filteredTransfers}
-            onDelete={(id) => void handleDeleteTransfer(id)}
+            onDeleteTransfer={(id) => void handleDeleteTransfer(id)}
           />
         </>
       )}

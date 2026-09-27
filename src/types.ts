@@ -40,6 +40,11 @@ export type WalletTransfer = {
 export type WalletData = {
   openingBalances: Record<WalletId, number>;
   transfers: WalletTransfer[];
+  creditCardSettings: {
+    closingDay: number;
+    paymentDay: number;
+    paymentWalletId: WalletId;
+  };
 };
 
 export type AppView =

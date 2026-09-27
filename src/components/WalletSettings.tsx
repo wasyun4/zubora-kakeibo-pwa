@@ -1,7 +1,7 @@
 // 【ウォレット設定】
 // 記録開始時点の各ウォレットの金額を設定します。
-import { useState } from "react";
-import type { WalletData } from "../types";
+import { useEffect, useState } from "react";
+import type { WalletData, WalletId } from "../types";
 import { walletIds, walletNames } from "../utils/wallets";
 
 type WalletSettingsProps = {
@@ -11,14 +11,32 @@ type WalletSettingsProps = {
 
 function WalletSettings({ data, onChange }: WalletSettingsProps) {
   const [opening, setOpening] = useState(() => ({ ...data.openingBalances }));
+  const [cardSettings, setCardSettings] = useState(() => ({ ...data.creditCardSettings }));
+
+  useEffect(() => {
+    setOpening({ ...data.openingBalances });
+    setCardSettings({ ...data.creditCardSettings });
+  }, [data]);
 
   async function saveOpening() {
     if (walletIds.some((id) => !Number.isFinite(opening[id]) || opening[id] < 0)) {
       alert("開始額には0円以上の数字を入力してください。");
       return;
     }
-    await onChange({ ...data, openingBalances: opening });
-    alert("ウォレットの開始額を保存しました。");
+    if (
+      cardSettings.closingDay < 1 || cardSettings.closingDay > 31 ||
+      cardSettings.paymentDay < 1 || cardSettings.paymentDay > 31 ||
+      cardSettings.paymentWalletId === "creditCard"
+    ) {
+      alert("クレカの締め日・引落日・引落口座を確認してください。");
+      return;
+    }
+    await onChange({
+      ...data,
+      openingBalances: opening,
+      creditCardSettings: cardSettings,
+    });
+    alert("ウォレットとクレカ設定を保存しました。");
   }
 
   return (
@@ -32,7 +50,30 @@ function WalletSettings({ data, onChange }: WalletSettingsProps) {
             onChange={(event) => setOpening({ ...opening, [id]: Number(event.target.value) })} />
         </label>
       ))}
-      <button type="button" onClick={() => void saveOpening()}>開始額を保存する</button>
+
+      <h3>クレカの自動引き落とし</h3>
+      <p>締め日までの利用額をまとめ、翌月の引落日に指定口座から自動で差し引きます。31日は月末締めです。</p>
+      <label>
+        締め日
+        <input type="number" min="1" max="31" value={cardSettings.closingDay}
+          onChange={(event) => setCardSettings({ ...cardSettings, closingDay: Number(event.target.value) })} />
+      </label>
+      <label>
+        引落日
+        <input type="number" min="1" max="31" value={cardSettings.paymentDay}
+          onChange={(event) => setCardSettings({ ...cardSettings, paymentDay: Number(event.target.value) })} />
+      </label>
+      <label>
+        引落口座
+        <select value={cardSettings.paymentWalletId}
+          onChange={(event) => setCardSettings({ ...cardSettings, paymentWalletId: event.target.value as WalletId })}>
+          {walletIds.filter((id) => id !== "creditCard").map((id) => (
+            <option key={id} value={id}>{walletNames[id]}</option>
+          ))}
+        </select>
+      </label>
+
+      <button type="button" onClick={() => void saveOpening()}>設定を保存する</button>
 
     </section>
   );

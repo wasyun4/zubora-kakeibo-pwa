@@ -1,5 +1,5 @@
 // 【月間収支まとめ】
-// App.tsxで計算された収入・生活支出・貯金・使える残りを表示する部品です。
+// App.tsxで計算された収入・生活支出・支払い予定・貯金・使える残りを表示します。
 
 import { formatCurrency } from "../utils/formatCurrency";
 import SummaryIcon from "./SummaryIcon";
@@ -7,6 +7,7 @@ import SummaryIcon from "./SummaryIcon";
 type SummaryProps = {
   incomeTotal: number;
   expenseTotal: number;
+  scheduledPaymentTotal: number;
   savingsTotal: number;
   availableBalance: number;
   isExpenseOverBudget: boolean;
@@ -15,6 +16,7 @@ type SummaryProps = {
 function Summary({
   incomeTotal,
   expenseTotal,
+  scheduledPaymentTotal,
   savingsTotal,
   availableBalance,
   isExpenseOverBudget,
@@ -41,6 +43,14 @@ function Summary({
         >
           {formatCurrency(expenseTotal)}
         </strong>
+      </div>
+
+      <div className="summary-item scheduled">
+        <span className="summary-label">
+          <span className="summary-icon"><SummaryIcon type="scheduled" /></span>
+          支払い予定
+        </span>
+        <strong>{formatCurrency(scheduledPaymentTotal)}</strong>
       </div>
 
       <div className="summary-item savings">

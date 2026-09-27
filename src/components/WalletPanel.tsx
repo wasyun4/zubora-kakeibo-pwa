@@ -7,9 +7,10 @@ import { walletIds, walletNames } from "../utils/wallets";
 type WalletPanelProps = {
   balances: Record<WalletId, number>;
   isLoaded: boolean;
+  nextCreditCardPayment: { date: string; amount: number } | null;
 };
 
-function WalletPanel({ balances, isLoaded }: WalletPanelProps) {
+function WalletPanel({ balances, isLoaded, nextCreditCardPayment }: WalletPanelProps) {
   return (
     <section className="wallet-panel">
       <h2>ウォレット別残高</h2>
@@ -25,6 +26,11 @@ function WalletPanel({ balances, isLoaded }: WalletPanelProps) {
               </li>
             ))}
           </ul>
+          {nextCreditCardPayment && (
+            <p className="wallet-note">
+              次回クレカ引落：{nextCreditCardPayment.date}　{formatCurrency(nextCreditCardPayment.amount)}
+            </p>
+          )}
           <p className="wallet-note">開始額とすべての記録から計算。クレカは未払い額です。</p>
         </>
       )}

@@ -2,7 +2,7 @@
 // 収入・支出・貯金・残額を表す線画アイコンを表示します。
 
 type SummaryIconProps = {
-  type: "income" | "expense" | "savings" | "balance";
+  type: "income" | "expense" | "scheduled" | "savings" | "balance";
 };
 
 function SummaryIcon({ type }: SummaryIconProps) {
@@ -42,6 +42,15 @@ function SummaryIcon({ type }: SummaryIconProps) {
         <path d="M5.5 10.5A6.8 6.8 0 0 1 12 6h2.5a5.5 5.5 0 0 1 5.3 4H22v4h-2.2a6.2 6.2 0 0 1-2.3 3l.5 2.5h-3L14.3 18H9.7L9 19.5H6L6.6 17A6.2 6.2 0 0 1 4 12.5H2.5v-2H5.5Z" />
         <path d="M11 6c.7-1.2 2.2-1.8 3.5-1.4" />
         <circle cx="16.5" cy="10" r=".55" fill="currentColor" stroke="none" />
+      </svg>
+    );
+  }
+
+  if (type === "scheduled") {
+    return (
+      <svg {...commonProps}>
+        <circle cx="12" cy="12" r="8" />
+        <path d="M12 7v5l3 2" />
       </svg>
     );
   }

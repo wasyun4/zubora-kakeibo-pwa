@@ -132,6 +132,18 @@ export async function restoreBackup(file: File) {
                 ...candidate.openingBalances,
             },
             transfers: candidate.transfers,
+            creditCardSettings:
+                candidate.creditCardSettings &&
+                    Number.isInteger(candidate.creditCardSettings.closingDay) &&
+                    candidate.creditCardSettings.closingDay >= 1 &&
+                    candidate.creditCardSettings.closingDay <= 31 &&
+                    Number.isInteger(candidate.creditCardSettings.paymentDay) &&
+                    candidate.creditCardSettings.paymentDay >= 1 &&
+                    candidate.creditCardSettings.paymentDay <= 31 &&
+                    walletIds.includes(candidate.creditCardSettings.paymentWalletId) &&
+                    candidate.creditCardSettings.paymentWalletId !== "creditCard"
+                    ? candidate.creditCardSettings
+                    : emptyWalletData.creditCardSettings,
         };
     }
 

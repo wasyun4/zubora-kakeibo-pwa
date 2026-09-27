@@ -157,9 +157,23 @@ export async function loadWalletData(): Promise<WalletData> {
                 openingBalances[id] = amount;
             }
         }
+        const savedCardSettings = parsed.creditCardSettings;
+        const creditCardSettings =
+            savedCardSettings &&
+                Number.isInteger(savedCardSettings.closingDay) &&
+                savedCardSettings.closingDay >= 1 &&
+                savedCardSettings.closingDay <= 31 &&
+                Number.isInteger(savedCardSettings.paymentDay) &&
+                savedCardSettings.paymentDay >= 1 &&
+                savedCardSettings.paymentDay <= 31 &&
+                walletIds.includes(savedCardSettings.paymentWalletId) &&
+                savedCardSettings.paymentWalletId !== "creditCard"
+                ? savedCardSettings
+                : emptyWalletData.creditCardSettings;
         return {
             openingBalances,
             transfers: Array.isArray(parsed.transfers) ? parsed.transfers : [],
+            creditCardSettings,
         };
     } catch {
         return emptyWalletData;

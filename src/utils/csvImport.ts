@@ -4,6 +4,7 @@
 import { initialCategories } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction } from "../types";
+import { createId } from "./createId";
 
 function parseCsvRows(csvText: string) {
     const rows: string[][] = [];
@@ -150,7 +151,7 @@ export async function readTransactionsCsv(file: File) {
         }
 
         return {
-            id: crypto.randomUUID(),
+            id: createId(),
             date,
             type,
             amount,
