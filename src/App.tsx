@@ -15,6 +15,7 @@ import type {
 } from "./types";
 import Summary from "./components/Summary";
 import CategoryTotals from "./components/CategoryTotals";
+import BudgetDonutChart from "./components/BudgetDonutChart";
 import TransactionList from "./components/TransactionList";
 import TransactionForm from "./components/TransactionForm";
 import MonthlyBudgetPanel from "./components/MonthlyBudgetPanel";
@@ -631,7 +632,14 @@ function App() {
 
       {/*分析画面*/}
       {activeView === "analysis" && (
-        <CategoryTotals categoryTotals={expenseCategoryTotals} />
+        <>
+          <BudgetDonutChart
+            totalBudget={monthlyBudgetTotal}
+            remainingBudget={remainingBudget}
+            statuses={categoryBudgetStatuses}
+          />
+          <CategoryTotals categoryTotals={expenseCategoryTotals} />
+        </>
       )}
 
       {/* 予算画面 */}
