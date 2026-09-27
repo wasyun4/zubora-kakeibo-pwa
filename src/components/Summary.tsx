@@ -2,6 +2,7 @@
 // App.tsxで計算された収入・生活支出・貯金・使える残りを表示する部品です。
 
 import { formatCurrency } from "../utils/formatCurrency";
+import SummaryIcon from "./SummaryIcon";
 
 type SummaryProps = {
   incomeTotal: number;
@@ -24,7 +25,7 @@ function Summary({
 
       <div className="summary-item income">
         <span className="summary-label">
-          <span className="summary-icon">＋</span>
+          <span className="summary-icon"><SummaryIcon type="income" /></span>
           収入
         </span>
         <strong>{formatCurrency(incomeTotal)}</strong>
@@ -32,7 +33,7 @@ function Summary({
 
       <div className="summary-item expense">
         <span className="summary-label">
-          <span className="summary-icon">－</span>
+          <span className="summary-icon"><SummaryIcon type="expense" /></span>
           生活支出
         </span>
         <strong
@@ -44,7 +45,7 @@ function Summary({
 
       <div className="summary-item savings">
         <span className="summary-label">
-          <span className="summary-icon">貯</span>
+          <span className="summary-icon"><SummaryIcon type="savings" /></span>
           貯金
         </span>
         <strong>{formatCurrency(savingsTotal)}</strong>
@@ -52,7 +53,7 @@ function Summary({
 
       <div className="summary-item balance">
         <span className="summary-label">
-          <span className="summary-icon">残</span>
+          <span className="summary-icon"><SummaryIcon type="balance" /></span>
           使える残り
         </span>
         <strong>{formatCurrency(availableBalance)}</strong>

@@ -20,14 +20,18 @@ function MonthFilter({
     );
     return (
         <div className="month-filter">
-            <input
-                type="month"
-                aria-label="表示する月"
-                value={selectedMonth}
-                onChange={(event) =>
-                    onMonthChange(event.target.value)
-                }
-            />
+            <label className="month-filter-control">
+                <span className="visually-hidden">表示する月</span>
+                <input
+                    type="month"
+                    aria-label="表示する月"
+                    value={selectedMonth}
+                    onChange={(event) =>
+                        onMonthChange(event.target.value)
+                    }
+                />
+                <span className="month-filter-chevron" aria-hidden="true">⌄</span>
+            </label>
             {period && (
                 <span className="month-filter-period" aria-live="polite">
                     対象期間：{period.label}
