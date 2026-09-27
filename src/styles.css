@@ -300,6 +300,7 @@ li button {
 }
 
 .budget-donut-track,
+.budget-donut-used-segment,
 .budget-donut-category-segment {
   fill: none;
 }
@@ -311,6 +312,16 @@ li button {
 
 .budget-donut-category-segment {
   stroke-width: 32;
+}
+
+.budget-donut-used-segment {
+  stroke: #90a4ae;
+  stroke-width: 32;
+  transition: stroke-dasharray 0.3s ease;
+}
+
+.budget-donut-used-segment.is-over {
+  stroke: #d32f2f;
 }
 
 .budget-donut-center {

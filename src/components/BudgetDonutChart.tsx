@@ -1,5 +1,5 @@
-// 【予算の二重円グラフ】
-// 外側にカテゴリ別予算、内側に月予算の使用済み・残りを表示します。
+// 【予算の円グラフ】
+// 使用済み金額と、金額順に並べたカテゴリ別の残り予算を表示します。
 
 import { formatCurrency } from "../utils/formatCurrency";
 
@@ -51,8 +51,23 @@ function BudgetDonutChart({
   const usedPercent = Math.min(100, (usedAmount / totalBudget) * 100);
   const remainingPercent = Math.max(0, 100 - usedPercent);
   const isOverBudget = safeRemaining < 0;
+  const sortedStatuses = [...statuses].sort(
+    (first, second) => second.budget - first.budget,
+  );
+  const positiveCategoryRemainingTotal = sortedStatuses.reduce(
+    (sum, status) => sum + Math.max(0, status.remaining),
+    0,
+  );
+  const chartRemainingAmount = Math.min(
+    totalBudget,
+    Math.max(0, safeRemaining),
+  );
+  const remainingScale =
+    positiveCategoryRemainingTotal > 0
+      ? chartRemainingAmount / positiveCategoryRemainingTotal
+      : 0;
 
-  let categoryOffset = 0;
+  let categoryOffset = usedPercent;
 
   return (
     <section className="budget-donut-card">
@@ -68,8 +83,19 @@ function BudgetDonutChart({
           >
             <circle className="budget-donut-track" cx="100" cy="100" r="70" pathLength="100" />
 
-            {statuses.map((status, index) => {
-              const percent = (status.budget / totalBudget) * 100;
+            <circle
+              className={`budget-donut-used-segment ${isOverBudget ? "is-over" : ""}`}
+              cx="100"
+              cy="100"
+              r="70"
+              pathLength="100"
+              strokeDasharray={`${usedPercent} ${100 - usedPercent}`}
+            />
+
+            {sortedStatuses.map((status, index) => {
+              const displayedRemaining =
+                Math.max(0, status.remaining) * remainingScale;
+              const percent = (displayedRemaining / totalBudget) * 100;
               const offset = categoryOffset;
               categoryOffset += percent;
 
@@ -113,7 +139,7 @@ function BudgetDonutChart({
       </div>
 
       <ul className="budget-donut-legend">
-        {statuses.map((status, index) => (
+        {sortedStatuses.map((status, index) => (
           <li key={status.id}>
             <span
               className="budget-donut-legend-color"
