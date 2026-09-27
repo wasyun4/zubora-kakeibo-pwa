@@ -627,6 +627,9 @@ li button {
   overflow-wrap: anywhere;
   text-align: center;
 }
+.category-picker-header-single {
+  grid-template-columns: minmax(0, 1fr) 2.75rem;
+}
 .category-picker-header button {
   min-height: 2.5rem;
   margin: 0;
@@ -642,6 +645,9 @@ li button {
 .category-picker-options button {
   min-height: 3rem;
   margin: 0;
+}
+.category-picker-options button[aria-pressed="true"] {
+  background: #1b5e20;
 }
 .quick-entry .entry-amount { display: block; margin-top: 0.85rem; }
 .entry-amount input { text-align: right; font-size: clamp(1.5rem, 7vw, 2.25rem); font-weight: bold; color: #263238; border: 0; border-bottom: 2px solid #c8e6c9; border-radius: 0; }

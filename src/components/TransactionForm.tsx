@@ -6,6 +6,7 @@ import type { PaymentMethod } from "../paymentMethods";
 import type { EntryType, TransactionScope, WalletId } from "../types";
 import { walletIds, walletNames } from "../utils/wallets";
 import ExpenseCategoryPicker from "./ExpenseCategoryPicker";
+import IncomeCategoryPicker from "./IncomeCategoryPicker";
 
 type TransactionFormProps = {
     type: EntryType;
@@ -82,12 +83,14 @@ function TransactionForm(props: TransactionFormProps) {
             </div>
 
             {!isTransfer && <div className="entry-fields">
-                {props.type === "income" && <label>収入カテゴリ
-                    <select value={props.majorCategoryId} onChange={(event) => props.onMajorCategoryChange(event.target.value)}>
-                        <option value="">選択してください</option>
-                        {props.incomeCategories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-                    </select>
-                </label>}
+                {props.type === "income" && <div className="entry-category-field">
+                    <span>収入カテゴリ</span>
+                    <IncomeCategoryPicker
+                        categories={props.incomeCategories}
+                        categoryId={props.majorCategoryId}
+                        onChange={props.onMajorCategoryChange}
+                    />
+                </div>}
                 {props.type === "expense" && <div className="entry-category-field">
                     <span>カテゴリ</span>
                     <ExpenseCategoryPicker
