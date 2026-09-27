@@ -28,7 +28,10 @@ import MobileLayout from "./components/MobileLayout";
 import TransactionDialog from "./components/TransactionDialog";
 import WalletTransferList from "./components/WalletTransferList";
 import { calculateWalletBalances, emptyWalletData } from "./utils/wallets";
-import { getAccountingPeriod } from "./utils/accountingPeriod";
+import {
+  getAccountingPeriod,
+  getCurrentAccountingMonth,
+} from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
 import { calculateMonthlyBudget } from "./utils/budgets";
 import {
@@ -47,13 +50,6 @@ import {
   saveWalletData,
   saveTransactions,
 } from "./utils/database";
-
-function getCurrentMonth() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
-}
 
 function App() {
   // 【収入・支出の大カテゴリ抽出】
@@ -89,7 +85,9 @@ function App() {
     useState(false);
   const [activeView, setActiveView] =
     useState<AppView>("home");
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth);
+  const [selectedMonth, setSelectedMonth] = useState(() =>
+    getCurrentAccountingMonth("1"),
+  );
 
   // 【月初め日の設定管理】
   const [monthStartDay, setMonthStartDay] = useState("1");
@@ -132,8 +130,9 @@ function App() {
   // 【IndexedDBから月初め日を読み込む】
   useEffect(() => {
     async function fetchMonthStartDay() {
-      const savedMonthStartDay = await loadMonthStartDay();
-      setMonthStartDay(savedMonthStartDay ?? "1");
+      const savedMonthStartDay = (await loadMonthStartDay()) ?? "1";
+      setMonthStartDay(savedMonthStartDay);
+      setSelectedMonth(getCurrentAccountingMonth(savedMonthStartDay));
     }
 
     void fetchMonthStartDay();
@@ -594,7 +593,11 @@ function App() {
     <MobileLayout
       selectedMonth={selectedMonth}
       monthStartDay={monthStartDay}
-      onMonthChange={(month) => setSelectedMonth(month || getCurrentMonth())}
+      onMonthChange={(month) =>
+        setSelectedMonth(
+          month || getCurrentAccountingMonth(monthStartDay),
+        )
+      }
       activeView={activeView}
       onViewChange={setActiveView}
     >

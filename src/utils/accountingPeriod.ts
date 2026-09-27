@@ -36,3 +36,20 @@ export function getAccountingPeriod(
         label: `${startDate.getMonth() + 1}/${startDate.getDate()}〜${endDate.getMonth() + 1}/${endDate.getDate()}`,
     };
 }
+
+export function getCurrentAccountingMonth(
+    monthStartDay: string,
+    today = new Date(),
+) {
+    const startDay = Number(monthStartDay);
+    const accountingMonth = new Date(
+        today.getFullYear(),
+        today.getMonth() +
+        (startDay > 1 && today.getDate() >= startDay ? 1 : 0),
+        1,
+    );
+    const year = accountingMonth.getFullYear();
+    const month = String(accountingMonth.getMonth() + 1).padStart(2, "0");
+
+    return `${year}-${month}`;
+}
