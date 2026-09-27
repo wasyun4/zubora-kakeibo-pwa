@@ -5,14 +5,50 @@ type MonthlyBudgetPanelProps = {
   selectedMonth: string;
   savedBudgetAmount: number | null;
   remainingBudget: number | null;
+  compact?: boolean;
 };
 
 export default function MonthlyBudgetPanel({
-  selectedMonth, savedBudgetAmount, remainingBudget,
+  selectedMonth, savedBudgetAmount, remainingBudget, compact = false,
 }: MonthlyBudgetPanelProps) {
   const usagePercentage = savedBudgetAmount !== null && savedBudgetAmount > 0 && remainingBudget !== null
     ? Math.round(((savedBudgetAmount - remainingBudget) / savedBudgetAmount) * 100)
     : null;
+
+  if (compact) {
+    const hasBudget = selectedMonth !== "" && savedBudgetAmount !== null && remainingBudget !== null;
+
+    return (
+      <section className="compact-budget-card">
+        <div className="compact-budget-header">
+          <h2>今月の予算</h2>
+          <strong className={hasBudget && remainingBudget < 0 ? "over-budget" : ""}>
+            {hasBudget && usagePercentage !== null ? `${usagePercentage}%` : "未設定"}
+          </strong>
+        </div>
+
+        <div className="budget-progress" aria-label="予算の使用率">
+          <div
+            className="budget-progress-bar"
+            style={{ width: `${Math.max(0, Math.min(usagePercentage ?? 0, 100))}%` }}
+          />
+        </div>
+
+        {hasBudget ? (
+          <div className="compact-budget-values">
+            <span>予算 {formatCurrency(savedBudgetAmount)}</span>
+            <strong className={remainingBudget < 0 ? "over-budget" : ""}>
+              {remainingBudget >= 0
+                ? `残り ${formatCurrency(remainingBudget)}`
+                : `超過 ${formatCurrency(Math.abs(remainingBudget))}`}
+            </strong>
+          </div>
+        ) : (
+          <p className="compact-budget-empty">予算画面でカテゴリ予算を設定できます。</p>
+        )}
+      </section>
+    );
+  }
 
   return (
     <section>

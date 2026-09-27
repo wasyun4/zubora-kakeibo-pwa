@@ -620,6 +620,7 @@ function App() {
             selectedMonth={selectedMonth}
             savedBudgetAmount={monthlyBudgetTotal}
             remainingBudget={remainingBudget}
+            compact
           />
 
           <CategoryBudgetComparison
