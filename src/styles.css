@@ -376,7 +376,7 @@ li button {
   font-size: 1.7rem;
   font-weight: bold;
   line-height: 1;
-  transform: translateY(-0.7rem);
+  transform: translateY(-0.475rem);
   pointer-events: none;
 }
 
