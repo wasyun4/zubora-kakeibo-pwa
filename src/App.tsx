@@ -257,6 +257,16 @@ function App() {
           transfer.date <= accountingPeriod.end,
       );
 
+  // 【表示月によるレシート履歴の絞り込み】
+  const filteredReceipts =
+    accountingPeriod === null
+      ? receipts
+      : receipts.filter(
+        (receipt) =>
+          receipt.date >= accountingPeriod.start &&
+          receipt.date <= accountingPeriod.end,
+      );
+
   // 【実績と支払い予定の分離】
   const realizedExpenses = filteredExpenses.filter(
     (expense) => expense.date <= todayText,
@@ -685,6 +695,12 @@ function App() {
     alert("レシートを登録しました！");
   }
 
+  // 【レシートと紐づく商品明細の削除】
+  function handleDeleteReceipt(id: string) {
+    setReceipts((current) => current.filter((receipt) => receipt.id !== id));
+    setReceiptItems((current) => current.filter((item) => item.receiptId !== id));
+  }
+
   // 【画面コンポーネントの組み立て】
   return (
     <MobileLayout
@@ -768,10 +784,13 @@ function App() {
           <TransactionList
             transactions={filteredExpenses}
             transfers={filteredTransfers}
+            receipts={filteredReceipts}
+            receiptItems={receiptItems}
             categories={categories}
             onEdit={handleEditTransaction}
             onDelete={handleDeleteExpense}
             onDeleteTransfer={(id) => void handleDeleteTransfer(id)}
+            onDeleteReceipt={handleDeleteReceipt}
           />
         </>
       )}

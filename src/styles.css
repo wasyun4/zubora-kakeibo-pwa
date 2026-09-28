@@ -1327,3 +1327,29 @@ li button {
 .receipt-items-total {
   text-align: right;
 }
+
+.receipt-type {
+  color: #355f86;
+  background: #dfeef8;
+}
+
+.receipt-history-details {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.65rem 0 0;
+  padding: 0.65rem 0 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+}
+
+.receipt-history-details li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.receipt-history-details small {
+  display: block;
+  color: var(--color-muted);
+}
