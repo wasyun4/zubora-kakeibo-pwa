@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Transaction, WalletData } from "../types";
+import type { Receipt, Transaction, WalletData } from "../types";
 import {
   calculateWalletBalances,
   getCreditCardPaymentDate,
@@ -42,6 +42,16 @@ function walletData(): WalletData {
   };
 }
 
+const receipt: Receipt = {
+  id: "receipt-1",
+  date: "2026-09-10",
+  storeName: "スーパー",
+  totalAmount: 3000,
+  paymentMethodId: "cash",
+  scope: "personal",
+  memo: "",
+};
+
 describe("クレカの引落日", () => {
   it("月末締めの利用分は翌月に引き落とす", () => {
     expect(getCreditCardPaymentDate("2026-09-10", cardSettings)).toBe("2026-10-27");
@@ -64,6 +74,16 @@ describe("クレカの引落日", () => {
 });
 
 describe("ウォレット残高", () => {
+  it("レシート合計を支払元の残高から引く", () => {
+    const balances = calculateWalletBalances(
+      walletData(),
+      [],
+      new Date(2026, 8, 29),
+      [receipt],
+    );
+    expect(balances.cash).toBe(17_000);
+  });
+
   it("未来日の支出は支払日まで残高に反映しない", () => {
     const balances = calculateWalletBalances(
       walletData(),

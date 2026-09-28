@@ -1,6 +1,6 @@
 // 【ウォレット残高の計算】
 // 開始額に収支と資金移動を反映します。クレカだけは未払い額として扱います。
-import type { Transaction, WalletData, WalletId } from "../types";
+import type { Receipt, Transaction, WalletData, WalletId } from "../types";
 
 export const walletIds: WalletId[] = [
   "cash", "bankAccount", "bankAccountRisona", "digitalPayment", "creditCard",
@@ -50,6 +50,7 @@ export function getCreditCardPayments(
   transactions: Transaction[],
   settings: WalletData["creditCardSettings"],
   today = new Date(),
+  receipts: Receipt[] = [],
 ) {
   const todayText = formatDate(today);
   const payments = new Map<string, number>();
@@ -65,6 +66,12 @@ export function getCreditCardPayments(
     payments.set(paymentDate, (payments.get(paymentDate) ?? 0) + Number(transaction.amount));
   }
 
+  for (const receipt of receipts) {
+    if (receipt.paymentMethodId !== "creditCard" || receipt.date > todayText) continue;
+    const paymentDate = getCreditCardPaymentDate(receipt.date, settings);
+    payments.set(paymentDate, (payments.get(paymentDate) ?? 0) + receipt.totalAmount);
+  }
+
   return [...payments.entries()]
     .map(([date, amount]) => ({ date, amount }))
     .sort((first, second) => first.date.localeCompare(second.date));
@@ -74,6 +81,7 @@ export function calculateWalletBalances(
   walletData: WalletData,
   transactions: Transaction[],
   today = new Date(),
+  receipts: Receipt[] = [],
 ): Record<WalletId, number> {
   const balances = { ...walletData.openingBalances };
   const todayText = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -95,6 +103,14 @@ export function calculateWalletBalances(
     }
   }
 
+  for (const receipt of receipts) {
+    if (receipt.date > todayText) continue;
+    const walletId = receipt.paymentMethodId as WalletId;
+    if (!walletIds.includes(walletId) || !Number.isFinite(receipt.totalAmount) || receipt.totalAmount <= 0) continue;
+    if (walletId === "creditCard") balances.creditCard += receipt.totalAmount;
+    else balances[walletId] -= receipt.totalAmount;
+  }
+
   for (const transfer of walletData.transfers) {
     if (transfer.date > todayText) continue;
 
@@ -112,6 +128,7 @@ export function calculateWalletBalances(
     transactions,
     walletData.creditCardSettings,
     today,
+    receipts,
   )) {
     if (payment.date > todayText) continue;
     balances[walletData.creditCardSettings.paymentWalletId] -= payment.amount;

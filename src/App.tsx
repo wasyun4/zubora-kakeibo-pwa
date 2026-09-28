@@ -277,6 +277,14 @@ function App() {
       expense.majorCategoryId !== "savings" &&
       expense.date > todayText,
   );
+  const realizedReceipts = filteredReceipts.filter((receipt) => receipt.date <= todayText);
+  const scheduledReceipts = filteredReceipts.filter((receipt) => receipt.date > todayText);
+  const realizedReceiptIds = new Set(realizedReceipts.map((receipt) => receipt.id));
+  const scheduledReceiptIds = new Set(scheduledReceipts.map((receipt) => receipt.id));
+  const filteredReceiptIds = new Set(filteredReceipts.map((receipt) => receipt.id));
+  const realizedReceiptItems = receiptItems.filter((item) => realizedReceiptIds.has(item.receiptId));
+  const scheduledReceiptItems = receiptItems.filter((item) => scheduledReceiptIds.has(item.receiptId));
+  const filteredReceiptItems = receiptItems.filter((item) => filteredReceiptIds.has(item.receiptId));
 
   // 【生活支出合計の計算】
   const expenseTotal = realizedExpenses
@@ -288,7 +296,9 @@ function App() {
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
-    );
+    ) + realizedReceiptItems
+      .filter((item) => item.majorCategoryId !== "savings")
+      .reduce((sum, item) => sum + item.amount, 0);
 
   // 【貯金合計の計算】
   const savingsTotal = filteredExpenses
@@ -300,7 +310,9 @@ function App() {
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
-    );
+    ) + filteredReceiptItems
+      .filter((item) => item.majorCategoryId === "savings")
+      .reduce((sum, item) => sum + item.amount, 0);
 
   // 【収入合計の計算】
   const incomeTotal = realizedExpenses
@@ -313,7 +325,9 @@ function App() {
   const scheduledPaymentTotal = scheduledExpenses.reduce(
     (sum, expense) => sum + Number(expense.amount),
     0,
-  );
+  ) + scheduledReceiptItems
+    .filter((item) => item.majorCategoryId !== "savings")
+    .reduce((sum, item) => sum + item.amount, 0);
 
   // 【大カテゴリ別支出合計の計算】
   const expenseCategoryTotals = expenseMajorCategories
@@ -328,7 +342,9 @@ function App() {
         .reduce(
           (sum, expense) => sum + Number(expense.amount),
           0,
-        );
+        ) + realizedReceiptItems
+          .filter((item) => item.majorCategoryId === category.id)
+          .reduce((sum, item) => sum + item.amount, 0);
 
       return {
         id: category.id,
@@ -349,7 +365,10 @@ function App() {
             expense.type === "expense" &&
             expense.majorCategoryId === category.id,
         )
-        .reduce((sum, expense) => sum + Number(expense.amount), 0),
+        .reduce((sum, expense) => sum + Number(expense.amount), 0) +
+        filteredReceiptItems
+          .filter((item) => item.majorCategoryId === category.id)
+          .reduce((sum, item) => sum + item.amount, 0),
     }));
 
   // 【カテゴリ別の支出実績と予算を結合】
@@ -404,9 +423,9 @@ function App() {
   const availableBalance =
     incomeTotal - expenseTotal - scheduledPaymentTotal - savingsTotal;
 
-  const walletBalances = calculateWalletBalances(walletData, expenses);
+  const walletBalances = calculateWalletBalances(walletData, expenses, undefined, receipts);
   const nextCreditCardPayment =
-    getCreditCardPayments(expenses, walletData.creditCardSettings)
+    getCreditCardPayments(expenses, walletData.creditCardSettings, undefined, receipts)
       .find((payment) => payment.date > todayText) ?? null;
 
   // 月予算は表示月のカテゴリ予算の合計。未設定カテゴリの支出も残額に含める。
