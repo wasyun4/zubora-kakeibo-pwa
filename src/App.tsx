@@ -8,6 +8,8 @@ import type {
   AppView,
   CategoryBudget,
   EntryType,
+  Receipt,
+  ReceiptItem,
   Transaction,
   TransactionScope,
   WalletData,
@@ -37,6 +39,8 @@ import {
 } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
 import CategorySettings from "./components/CategorySettings";
+import EntryMenu from "./components/EntryMenu";
+import ReceiptForm from "./components/ReceiptForm";
 import { calculateMonthlyBudget } from "./utils/budgets";
 import {
   downloadBackup,
@@ -49,11 +53,15 @@ import {
   loadCategoryBudgets,
   loadCategories,
   loadMonthStartDay,
+  loadReceipts,
+  loadReceiptItems,
   loadWalletData,
   loadTransactions,
   saveCategoryBudgets,
   saveCategories,
   saveMonthStartDay,
+  saveReceipts,
+  saveReceiptItems,
   saveWalletData,
   saveTransactions,
 } from "./utils/database";
@@ -94,6 +102,8 @@ function App() {
     useState<string | null>(null);
   const [isTransactionFormOpen, setIsTransactionFormOpen] =
     useState(false);
+  const [isEntryMenuOpen, setIsEntryMenuOpen] = useState(false);
+  const [isReceiptFormOpen, setIsReceiptFormOpen] = useState(false);
   const [activeView, setActiveView] =
     useState<AppView>("home");
   const [selectedMonth, setSelectedMonth] = useState(() =>
@@ -125,6 +135,9 @@ function App() {
   const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
   const [walletData, setWalletData] = useState<WalletData>(emptyWalletData);
   const [isWalletDataLoaded, setIsWalletDataLoaded] = useState(false);
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [receiptItems, setReceiptItems] = useState<ReceiptItem[]>([]);
+  const [areReceiptsLoaded, setAreReceiptsLoaded] = useState(false);
 
   useEffect(() => {
     void loadCategories().then((saved) => {
@@ -137,6 +150,19 @@ function App() {
     if (!areCategoriesLoaded) return;
     void saveCategories(categories);
   }, [categories, areCategoriesLoaded]);
+
+  useEffect(() => {
+    void Promise.all([loadReceipts(), loadReceiptItems()]).then(([savedReceipts, savedItems]) => {
+      setReceipts(savedReceipts);
+      setReceiptItems(savedItems);
+      setAreReceiptsLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!areReceiptsLoaded) return;
+    void Promise.all([saveReceipts(receipts), saveReceiptItems(receiptItems)]);
+  }, [receipts, receiptItems, areReceiptsLoaded]);
 
   useEffect(() => {
     void loadWalletData().then((saved) => {
@@ -651,6 +677,14 @@ function App() {
     setIsTransactionFormOpen(true);
   }
 
+  // 【レシートと商品明細の登録】
+  function handleSaveReceipt(receipt: Receipt, items: ReceiptItem[]) {
+    setReceipts((current) => [...current, receipt]);
+    setReceiptItems((current) => [...current, ...items]);
+    setIsReceiptFormOpen(false);
+    alert("レシートを登録しました！");
+  }
+
   // 【画面コンポーネントの組み立て】
   return (
     <MobileLayout
@@ -747,12 +781,28 @@ function App() {
         className="floating-add-button"
         aria-label="収支を登録する"
         onClick={() => {
-          resetForm();
-          setIsTransactionFormOpen(true);
+          setIsEntryMenuOpen(true);
         }}
       >
         ＋
       </button>
+
+      {isEntryMenuOpen && (
+        <TransactionDialog onCancel={() => setIsEntryMenuOpen(false)}>
+          <EntryMenu
+            onTransaction={() => {
+              setIsEntryMenuOpen(false);
+              resetForm();
+              setIsTransactionFormOpen(true);
+            }}
+            onReceipt={() => {
+              setIsEntryMenuOpen(false);
+              setIsReceiptFormOpen(true);
+            }}
+            onCancel={() => setIsEntryMenuOpen(false)}
+          />
+        </TransactionDialog>
+      )}
 
       {isTransactionFormOpen && (
         <TransactionDialog onCancel={resetForm}>
@@ -794,6 +844,17 @@ function App() {
               onSubmit={() => void handleFormSubmit()}
               onCancel={resetForm}
             />
+        </TransactionDialog>
+      )}
+
+      {isReceiptFormOpen && (
+        <TransactionDialog onCancel={() => setIsReceiptFormOpen(false)}>
+          <ReceiptForm
+            categories={categories}
+            paymentMethods={initialPaymentMethods}
+            onSave={handleSaveReceipt}
+            onCancel={() => setIsReceiptFormOpen(false)}
+          />
         </TransactionDialog>
       )}
       {/* 設定画面 */}

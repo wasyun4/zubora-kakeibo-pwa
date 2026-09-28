@@ -1267,3 +1267,63 @@ li button {
     padding: 0.5rem 0 max(0.5rem, env(safe-area-inset-bottom));
   }
 }
+
+.entry-menu {
+  padding: 1rem;
+  background: var(--color-card);
+}
+
+.entry-menu-options {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.entry-menu-options button {
+  min-height: 4rem;
+}
+
+.receipt-entry {
+  overflow-y: auto;
+}
+
+.receipt-entry h3 {
+  margin: 0.75rem 0 0.5rem;
+}
+
+.receipt-item-list {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+.receipt-item-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 2.25rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--color-surface-muted);
+  border-radius: 0.5rem;
+}
+
+.receipt-item-list button {
+  min-height: 2.25rem;
+  margin: 0;
+  padding: 0.25rem;
+  background: var(--color-muted);
+}
+
+.receipt-item-editor {
+  padding: 0.7rem;
+  background: var(--color-surface-muted);
+  border-radius: 0.75rem;
+}
+
+.receipt-item-editor label {
+  margin-bottom: 0.5rem;
+}
+
+.receipt-items-total {
+  text-align: right;
+}
