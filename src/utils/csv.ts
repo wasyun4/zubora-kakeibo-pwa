@@ -1,7 +1,7 @@
 // 【CSVファイルの出力】
 // 収支履歴をExcelでも読みやすいCSVファイルとして保存します。
 
-import { initialCategories } from "../categories";
+import type { Category } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction } from "../types";
 
@@ -13,6 +13,7 @@ function escapeCsv(value: string | number) {
 
 export function downloadTransactionsCsv(
     transactions: Transaction[],
+    categories: Category[],
 ) {
     const header = [
         "日付",
@@ -27,12 +28,12 @@ export function downloadTransactionsCsv(
     ];
 
     const rows = transactions.map((transaction) => {
-        const majorCategory = initialCategories.find(
+        const majorCategory = categories.find(
             (category) =>
                 category.id === transaction.majorCategoryId,
         );
 
-        const minorCategory = initialCategories.find(
+        const minorCategory = categories.find(
             (category) =>
                 category.id === transaction.minorCategoryId,
         );

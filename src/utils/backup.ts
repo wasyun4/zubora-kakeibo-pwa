@@ -3,17 +3,21 @@
 
 import {
     loadCategoryBudgets,
+    loadCategories,
     loadMonthlyBudgets,
     loadMonthStartDay,
     loadTransactions,
     loadWalletData,
     saveCategoryBudgets,
+    saveCategories,
     saveMonthlyBudgets,
     saveMonthStartDay,
     saveTransactions,
     saveWalletData,
 } from "./database";
 import { emptyWalletData, walletIds } from "./wallets";
+import { initialCategories, type Category } from "../categories";
+import { isCategoryArray } from "./categoryManagement";
 
 import type {
     CategoryBudget,
@@ -29,12 +33,14 @@ export async function downloadBackup() {
         categoryBudgets,
         savedMonthStartDay,
         walletData,
+        categories,
     ] = await Promise.all([
         loadTransactions(),
         loadMonthlyBudgets(),
         loadCategoryBudgets(),
         loadMonthStartDay(),
         loadWalletData(),
+        loadCategories(),
     ]);
 
     const backupData = {
@@ -46,6 +52,7 @@ export async function downloadBackup() {
             categoryBudgets,
             monthStartDay: savedMonthStartDay ?? "1",
             walletData,
+            categories,
         },
     };
 
@@ -84,6 +91,7 @@ export async function restoreBackup(file: File) {
             categoryBudgets?: unknown[];
             monthStartDay?: string;
             walletData?: unknown;
+            categories?: unknown;
         };
     };
 
@@ -147,6 +155,12 @@ export async function restoreBackup(file: File) {
         };
     }
 
+    const categories: Category[] = data.categories === undefined
+        ? initialCategories.map((category) => ({ ...category }))
+        : isCategoryArray(data.categories)
+            ? data.categories
+            : (() => { throw new Error("カテゴリデータを読み込めません。"); })();
+
     await Promise.all([
         saveTransactions(data.expenses as Transaction[]),
         saveMonthlyBudgets(
@@ -157,6 +171,7 @@ export async function restoreBackup(file: File) {
         ),
         saveMonthStartDay(data.monthStartDay),
         saveWalletData(walletData),
+        saveCategories(categories),
     ]);
 
     return true;

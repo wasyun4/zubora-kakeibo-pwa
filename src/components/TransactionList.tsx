@@ -2,7 +2,7 @@
 // 収支と振替を日付順にまとめ、編集・削除する履歴をApp.tsxへ伝えます。
 
 import { useState } from "react";
-import { initialCategories } from "../categories";
+import type { Category } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction, WalletTransfer } from "../types";
 import { formatCurrency } from "../utils/formatCurrency";
@@ -13,20 +13,17 @@ type SelectionMode = "none" | "edit" | "delete";
 type TransactionListProps = {
   transactions: Transaction[];
   transfers: WalletTransfer[];
+  categories: Category[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onDeleteTransfer: (id: string) => void;
 };
 
-function getCategoryName(categoryId: string) {
-  return initialCategories.find((item) => item.id === categoryId)?.name || "カテゴリなし";
-}
-
 function getPaymentMethodName(paymentMethodId: string) {
   return initialPaymentMethods.find((item) => item.id === paymentMethodId)?.name || "支払方法なし";
 }
 
-function TransactionList({ transactions, transfers, onEdit, onDelete, onDeleteTransfer }: TransactionListProps) {
+function TransactionList({ transactions, transfers, categories, onEdit, onDelete, onDeleteTransfer }: TransactionListProps) {
   const [selectionMode, setSelectionMode] = useState<SelectionMode>("none");
   const today = new Date();
   const todayText = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -34,6 +31,8 @@ function TransactionList({ transactions, transfers, onEdit, onDelete, onDeleteTr
     ...transactions.map((transaction) => ({ kind: "transaction" as const, id: transaction.id, date: transaction.date, transaction })),
     ...transfers.map((transfer) => ({ kind: "transfer" as const, id: transfer.id, date: transfer.date, transfer })),
   ].sort((first, second) => second.date.localeCompare(first.date));
+  const getCategoryName = (categoryId: string) =>
+    categories.find((item) => item.id === categoryId)?.name || "カテゴリなし";
 
   function handleHistorySelect(item: (typeof historyItems)[number]) {
     if (selectionMode === "edit") {

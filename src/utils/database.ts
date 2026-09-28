@@ -9,6 +9,8 @@ import type {
     WalletData,
 } from "../types";
 import { emptyWalletData, walletIds } from "./wallets";
+import { initialCategories, type Category } from "../categories";
+import { isCategoryArray } from "./categoryManagement";
 
 interface KakeiboDatabase extends DBSchema {
     transactions: {
@@ -183,4 +185,26 @@ export async function loadWalletData(): Promise<WalletData> {
 export async function saveWalletData(data: WalletData) {
     const database = await databasePromise;
     await database.put("settings", JSON.stringify(data), "walletData");
+}
+
+// 【カテゴリ設定の読み込み・保存】
+export async function loadCategories(): Promise<Category[]> {
+    const database = await databasePromise;
+    const saved = await database.get("settings", "categories");
+
+    if (!saved) return initialCategories.map((category) => ({ ...category }));
+
+    try {
+        const parsed: unknown = JSON.parse(saved);
+        return isCategoryArray(parsed)
+            ? parsed
+            : initialCategories.map((category) => ({ ...category }));
+    } catch {
+        return initialCategories.map((category) => ({ ...category }));
+    }
+}
+
+export async function saveCategories(categories: Category[]) {
+    const database = await databasePromise;
+    await database.put("settings", JSON.stringify(categories), "categories");
 }

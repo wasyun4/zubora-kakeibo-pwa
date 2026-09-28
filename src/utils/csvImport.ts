@@ -1,7 +1,7 @@
 // 【CSVファイルの読み取り】
 // この家計簿から出力したCSVを、収支履歴へ変換します。
 
-import { initialCategories } from "../categories";
+import type { Category } from "../categories";
 import { initialPaymentMethods } from "../paymentMethods";
 import type { Transaction } from "../types";
 import { createId } from "./createId";
@@ -56,7 +56,7 @@ function parseCsvRows(csvText: string) {
     return rows;
 }
 
-export async function readTransactionsCsv(file: File) {
+export async function readTransactionsCsv(file: File, categories: Category[]) {
     const csvText = await file.text();
     const rows = parseCsvRows(csvText.replace(/^\uFEFF/, ""));
     const [header, ...dataRows] = rows;
@@ -102,14 +102,14 @@ export async function readTransactionsCsv(file: File) {
                     ? "expense"
                     : "";
 
-        const majorCategory = initialCategories.find(
+        const majorCategory = categories.find(
             (category) =>
                 category.name === majorCategoryName &&
                 category.type === type &&
                 category.parentId === null,
         );
 
-        const minorCategory = initialCategories.find(
+        const minorCategory = categories.find(
             (category) =>
                 category.name === minorCategoryName &&
                 category.parentId === majorCategory?.id,

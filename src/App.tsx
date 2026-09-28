@@ -2,7 +2,7 @@
 // データの管理・集計・操作を行い、各画面コンポーネントを組み合わせるファイルです。
 
 import { useEffect, useState } from "react";
-import { initialCategories } from "./categories";
+import { initialCategories, type Category } from "./categories";
 import { initialPaymentMethods } from "./paymentMethods";
 import type {
   AppView,
@@ -36,6 +36,7 @@ import {
   getCurrentAccountingMonth,
 } from "./utils/accountingPeriod";
 import CsvPanel from "./components/CsvPanel";
+import CategorySettings from "./components/CategorySettings";
 import { calculateMonthlyBudget } from "./utils/budgets";
 import {
   downloadBackup,
@@ -46,25 +47,31 @@ import { readTransactionsCsv } from "./utils/csvImport";
 import { createId } from "./utils/createId";
 import {
   loadCategoryBudgets,
+  loadCategories,
   loadMonthStartDay,
   loadWalletData,
   loadTransactions,
   saveCategoryBudgets,
+  saveCategories,
   saveMonthStartDay,
   saveWalletData,
   saveTransactions,
 } from "./utils/database";
 
 function App() {
+  // 【カテゴリ設定の状態管理】
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [areCategoriesLoaded, setAreCategoriesLoaded] = useState(false);
+
   // 【収入・支出の大カテゴリ抽出】
-  const incomeCategories = initialCategories.filter(
+  const incomeCategories = categories.filter(
     (category) =>
       category.type === "income" &&
       category.parentId === null &&
       category.isActive,
   );
 
-  const expenseMajorCategories = initialCategories.filter(
+  const expenseMajorCategories = categories.filter(
     (category) =>
       category.type === "expense" &&
       category.parentId === null &&
@@ -106,7 +113,7 @@ function App() {
   const [source, setSource] = useState("");
 
   // 【支出の小カテゴリ抽出】
-  const expenseMinorCategories = initialCategories.filter(
+  const expenseMinorCategories = categories.filter(
     (category) =>
       category.type === "expense" &&
       category.parentId !== null &&
@@ -118,6 +125,18 @@ function App() {
   const [isDatabaseLoaded, setIsDatabaseLoaded] = useState(false);
   const [walletData, setWalletData] = useState<WalletData>(emptyWalletData);
   const [isWalletDataLoaded, setIsWalletDataLoaded] = useState(false);
+
+  useEffect(() => {
+    void loadCategories().then((saved) => {
+      setCategories(saved);
+      setAreCategoriesLoaded(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!areCategoriesLoaded) return;
+    void saveCategories(categories);
+  }, [categories, areCategoriesLoaded]);
 
   useEffect(() => {
     void loadWalletData().then((saved) => {
@@ -429,7 +448,7 @@ function App() {
   async function handleImportCsv(file: File) {
     try {
       const importedTransactions =
-        await readTransactionsCsv(file);
+        await readTransactionsCsv(file, categories);
 
       if (importedTransactions.length === 0) {
         alert("取り込める収支データがありません。");
@@ -715,6 +734,7 @@ function App() {
           <TransactionList
             transactions={filteredExpenses}
             transfers={filteredTransfers}
+            categories={categories}
             onEdit={handleEditTransaction}
             onDelete={handleDeleteExpense}
             onDeleteTransfer={(id) => void handleDeleteTransfer(id)}
@@ -791,8 +811,12 @@ function App() {
             <WalletSettings data={walletData} onChange={updateWalletData} />
           )}
 
+          {areCategoriesLoaded && (
+            <CategorySettings categories={categories} onChange={setCategories} />
+          )}
+
           <CsvPanel
-            onExport={() => downloadTransactionsCsv(expenses)}
+            onExport={() => downloadTransactionsCsv(expenses, categories)}
             onImport={handleImportCsv}
           />
         </>
