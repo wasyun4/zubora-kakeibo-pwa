@@ -47,6 +47,28 @@ export type WalletData = {
   };
 };
 
+// レシート1枚分の情報。画像自体は保存しません。
+export type Receipt = {
+  id: string;
+  date: string;
+  storeName: string;
+  totalAmount: number;
+  paymentMethodId: string;
+  scope: TransactionScope;
+  memo: string;
+};
+
+// レシートに記載された商品1件分の情報。
+export type ReceiptItem = {
+  id: string;
+  receiptId: string;
+  name: string;
+  quantity: number;
+  amount: number;
+  majorCategoryId: string;
+  minorCategoryId: string;
+};
+
 export type AppView =
   | "home"
   | "records"
