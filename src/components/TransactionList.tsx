@@ -17,6 +17,7 @@ type TransactionListProps = {
   receiptItems: ReceiptItem[];
   categories: Category[];
   onEdit: (id: string) => void;
+  onEditReceipt: (id: string) => void;
   onDelete: (id: string) => void;
   onDeleteTransfer: (id: string) => void;
   onDeleteReceipt: (id: string) => void;
@@ -26,7 +27,7 @@ function getPaymentMethodName(paymentMethodId: string) {
   return initialPaymentMethods.find((item) => item.id === paymentMethodId)?.name || "支払方法なし";
 }
 
-export default function TransactionList({ transactions, transfers, receipts, receiptItems, categories, onEdit, onDelete, onDeleteTransfer, onDeleteReceipt }: TransactionListProps) {
+export default function TransactionList({ transactions, transfers, receipts, receiptItems, categories, onEdit, onEditReceipt, onDelete, onDeleteTransfer, onDeleteReceipt }: TransactionListProps) {
   const [selectionMode, setSelectionMode] = useState<SelectionMode>("none");
   const [openReceiptId, setOpenReceiptId] = useState<string | null>(null);
   const today = new Date();
@@ -45,7 +46,8 @@ export default function TransactionList({ transactions, transfers, receipts, rec
     }
     if (selectionMode === "edit") {
       if (item.kind === "transaction") onEdit(item.id);
-      else alert(item.kind === "receipt" ? "レシート編集は次のステップで追加します。" : "振替は削除して登録し直してください。");
+      else if (item.kind === "receipt") onEditReceipt(item.id);
+      else alert("振替は削除して登録し直してください。");
       setSelectionMode("none");
       return;
     }
@@ -64,7 +66,7 @@ export default function TransactionList({ transactions, transfers, receipts, rec
         <button type="button" className="edit-button" onClick={() => setSelectionMode(selectionMode === "edit" ? "none" : "edit")}>編集</button>
         <button type="button" className="delete-button" onClick={() => setSelectionMode(selectionMode === "delete" ? "none" : "delete")}>削除</button>
       </div>
-      {selectionMode !== "none" && <p className="selection-guide">{selectionMode === "edit" ? "編集する収支を選択してください。レシート編集は次のステップで追加します。" : "削除する履歴を選択してください。"}</p>}
+      {selectionMode !== "none" && <p className="selection-guide">{selectionMode === "edit" ? "編集する収支またはレシートを選択してください。" : "削除する履歴を選択してください。"}</p>}
 
       {historyItems.length === 0 ? <p>この月の履歴はまだありません。</p> : <ul>
         {historyItems.map((item) => {

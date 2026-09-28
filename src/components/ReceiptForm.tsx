@@ -11,6 +11,8 @@ import { calculateReceiptItemsTotal, getReceiptValidationError } from "../utils/
 type ReceiptFormProps = {
   categories: Category[];
   paymentMethods: PaymentMethod[];
+  initialReceipt?: Receipt;
+  initialItems?: ReceiptItem[];
   onSave: (receipt: Receipt, items: ReceiptItem[]) => void;
   onCancel: () => void;
 };
@@ -20,15 +22,15 @@ function getTodayText() {
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 }
 
-export default function ReceiptForm({ categories, paymentMethods, onSave, onCancel }: ReceiptFormProps) {
-  const [receiptId] = useState(createId);
-  const [date, setDate] = useState(getTodayText);
-  const [storeName, setStoreName] = useState("");
-  const [totalAmount, setTotalAmount] = useState("");
-  const [paymentMethodId, setPaymentMethodId] = useState("");
-  const [scope, setScope] = useState<TransactionScope>("personal");
-  const [memo, setMemo] = useState("");
-  const [items, setItems] = useState<ReceiptItem[]>([]);
+export default function ReceiptForm({ categories, paymentMethods, initialReceipt, initialItems = [], onSave, onCancel }: ReceiptFormProps) {
+  const [receiptId] = useState(() => initialReceipt?.id ?? createId());
+  const [date, setDate] = useState(initialReceipt?.date ?? getTodayText());
+  const [storeName, setStoreName] = useState(initialReceipt?.storeName ?? "");
+  const [totalAmount, setTotalAmount] = useState(initialReceipt ? String(initialReceipt.totalAmount) : "");
+  const [paymentMethodId, setPaymentMethodId] = useState(initialReceipt?.paymentMethodId ?? "");
+  const [scope, setScope] = useState<TransactionScope>(initialReceipt?.scope ?? "personal");
+  const [memo, setMemo] = useState(initialReceipt?.memo ?? "");
+  const [items, setItems] = useState<ReceiptItem[]>(initialItems);
   const [itemName, setItemName] = useState("");
   const [itemAmount, setItemAmount] = useState("");
   const [majorCategoryId, setMajorCategoryId] = useState("");
@@ -82,7 +84,7 @@ export default function ReceiptForm({ categories, paymentMethods, onSave, onCanc
   return (
     <section className="quick-entry receipt-entry">
       <div className="quick-entry-header">
-        <h2 id="transaction-form-title">レシート入力</h2>
+        <h2 id="transaction-form-title">{initialReceipt ? "レシート編集" : "レシート入力"}</h2>
         <button type="button" className="entry-close" aria-label="レシート入力を閉じる" onClick={onCancel}>×</button>
       </div>
 
@@ -108,7 +110,7 @@ export default function ReceiptForm({ categories, paymentMethods, onSave, onCanc
 
       <div className="entry-actions">
         <button type="button" className="cancel-button" onClick={onCancel}>キャンセル</button>
-        <button type="button" onClick={saveReceipt}>登録する</button>
+        <button type="button" onClick={saveReceipt}>{initialReceipt ? "更新する" : "登録する"}</button>
       </div>
     </section>
   );

@@ -104,6 +104,7 @@ function App() {
     useState(false);
   const [isEntryMenuOpen, setIsEntryMenuOpen] = useState(false);
   const [isReceiptFormOpen, setIsReceiptFormOpen] = useState(false);
+  const [editingReceiptId, setEditingReceiptId] = useState<string | null>(null);
   const [activeView, setActiveView] =
     useState<AppView>("home");
   const [selectedMonth, setSelectedMonth] = useState(() =>
@@ -708,10 +709,29 @@ function App() {
 
   // 【レシートと商品明細の登録】
   function handleSaveReceipt(receipt: Receipt, items: ReceiptItem[]) {
-    setReceipts((current) => [...current, receipt]);
-    setReceiptItems((current) => [...current, ...items]);
+    setReceipts((current) =>
+      current.some((item) => item.id === receipt.id)
+        ? current.map((item) => item.id === receipt.id ? receipt : item)
+        : [...current, receipt],
+    );
+    setReceiptItems((current) => [
+      ...current.filter((item) => item.receiptId !== receipt.id),
+      ...items,
+    ]);
     setIsReceiptFormOpen(false);
-    alert("レシートを登録しました！");
+    setEditingReceiptId(null);
+    alert(editingReceiptId ? "レシートを更新しました！" : "レシートを登録しました！");
+  }
+
+  function handleEditReceipt(id: string) {
+    if (!receipts.some((receipt) => receipt.id === id)) return;
+    setEditingReceiptId(id);
+    setIsReceiptFormOpen(true);
+  }
+
+  function closeReceiptForm() {
+    setIsReceiptFormOpen(false);
+    setEditingReceiptId(null);
   }
 
   // 【レシートと紐づく商品明細の削除】
@@ -807,6 +827,7 @@ function App() {
             receiptItems={receiptItems}
             categories={categories}
             onEdit={handleEditTransaction}
+            onEditReceipt={handleEditReceipt}
             onDelete={handleDeleteExpense}
             onDeleteTransfer={(id) => void handleDeleteTransfer(id)}
             onDeleteReceipt={handleDeleteReceipt}
@@ -835,6 +856,7 @@ function App() {
             }}
             onReceipt={() => {
               setIsEntryMenuOpen(false);
+              setEditingReceiptId(null);
               setIsReceiptFormOpen(true);
             }}
             onCancel={() => setIsEntryMenuOpen(false)}
@@ -886,12 +908,14 @@ function App() {
       )}
 
       {isReceiptFormOpen && (
-        <TransactionDialog onCancel={() => setIsReceiptFormOpen(false)}>
+        <TransactionDialog onCancel={closeReceiptForm}>
           <ReceiptForm
             categories={categories}
             paymentMethods={initialPaymentMethods}
+            initialReceipt={receipts.find((receipt) => receipt.id === editingReceiptId)}
+            initialItems={receiptItems.filter((item) => item.receiptId === editingReceiptId)}
             onSave={handleSaveReceipt}
-            onCancel={() => setIsReceiptFormOpen(false)}
+            onCancel={closeReceiptForm}
           />
         </TransactionDialog>
       )}
