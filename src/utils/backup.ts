@@ -5,12 +5,16 @@ import {
     loadCategoryBudgets,
     loadCategories,
     loadMonthlyBudgets,
+    loadReceipts,
+    loadReceiptItems,
     loadMonthStartDay,
     loadTransactions,
     loadWalletData,
     saveCategoryBudgets,
     saveCategories,
     saveMonthlyBudgets,
+    saveReceipts,
+    saveReceiptItems,
     saveMonthStartDay,
     saveTransactions,
     saveWalletData,
@@ -22,6 +26,8 @@ import { isCategoryArray } from "./categoryManagement";
 import type {
     CategoryBudget,
     MonthlyBudget,
+    Receipt,
+    ReceiptItem,
     Transaction,
     WalletData,
 } from "../types";
@@ -34,6 +40,8 @@ export async function downloadBackup() {
         savedMonthStartDay,
         walletData,
         categories,
+        receipts,
+        receiptItems,
     ] = await Promise.all([
         loadTransactions(),
         loadMonthlyBudgets(),
@@ -41,6 +49,8 @@ export async function downloadBackup() {
         loadMonthStartDay(),
         loadWalletData(),
         loadCategories(),
+        loadReceipts(),
+        loadReceiptItems(),
     ]);
 
     const backupData = {
@@ -53,6 +63,8 @@ export async function downloadBackup() {
             monthStartDay: savedMonthStartDay ?? "1",
             walletData,
             categories,
+            receipts,
+            receiptItems,
         },
     };
 
@@ -92,6 +104,8 @@ export async function restoreBackup(file: File) {
             monthStartDay?: string;
             walletData?: unknown;
             categories?: unknown;
+            receipts?: unknown[];
+            receiptItems?: unknown[];
         };
     };
 
@@ -161,6 +175,13 @@ export async function restoreBackup(file: File) {
             ? data.categories
             : (() => { throw new Error("カテゴリデータを読み込めません。"); })();
 
+    const receipts = data.receipts ?? [];
+    const receiptItems = data.receiptItems ?? [];
+
+    if (!Array.isArray(receipts) || !Array.isArray(receiptItems)) {
+        throw new Error("レシートデータを読み込めません。");
+    }
+
     await Promise.all([
         saveTransactions(data.expenses as Transaction[]),
         saveMonthlyBudgets(
@@ -172,6 +193,8 @@ export async function restoreBackup(file: File) {
         saveMonthStartDay(data.monthStartDay),
         saveWalletData(walletData),
         saveCategories(categories),
+        saveReceipts(receipts as Receipt[]),
+        saveReceiptItems(receiptItems as ReceiptItem[]),
     ]);
 
     return true;

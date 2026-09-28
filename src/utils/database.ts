@@ -5,6 +5,8 @@ import { openDB, type DBSchema } from "idb";
 import type {
     CategoryBudget,
     MonthlyBudget,
+    Receipt,
+    ReceiptItem,
     Transaction,
     WalletData,
 } from "../types";
@@ -29,26 +31,39 @@ interface KakeiboDatabase extends DBSchema {
         key: string;
         value: string;
     };
+    receipts: {
+        key: string;
+        value: Receipt;
+    };
+    receiptItems: {
+        key: string;
+        value: ReceiptItem;
+    };
 }
 
 export const databasePromise = openDB<KakeiboDatabase>(
     "zubora-kakeibo",
-    1,
+    2,
     {
         upgrade(database) {
-            database.createObjectStore("transactions", {
-                keyPath: "id",
-            });
-
-            database.createObjectStore("monthlyBudgets", {
-                keyPath: "month",
-            });
-
-            database.createObjectStore("categoryBudgets", {
-                keyPath: ["month", "majorCategoryId"],
-            });
-
-            database.createObjectStore("settings");
+            if (!database.objectStoreNames.contains("transactions")) {
+                database.createObjectStore("transactions", { keyPath: "id" });
+            }
+            if (!database.objectStoreNames.contains("monthlyBudgets")) {
+                database.createObjectStore("monthlyBudgets", { keyPath: "month" });
+            }
+            if (!database.objectStoreNames.contains("categoryBudgets")) {
+                database.createObjectStore("categoryBudgets", { keyPath: ["month", "majorCategoryId"] });
+            }
+            if (!database.objectStoreNames.contains("settings")) {
+                database.createObjectStore("settings");
+            }
+            if (!database.objectStoreNames.contains("receipts")) {
+                database.createObjectStore("receipts", { keyPath: "id" });
+            }
+            if (!database.objectStoreNames.contains("receiptItems")) {
+                database.createObjectStore("receiptItems", { keyPath: "id" });
+            }
         },
     },
 );
@@ -142,6 +157,38 @@ export async function saveMonthStartDay(monthStartDay: string) {
         monthStartDay,
         "monthStartDay",
     );
+}
+
+// 【レシート本体の読み込み・保存】
+export async function loadReceipts() {
+    const database = await databasePromise;
+    return database.getAll("receipts");
+}
+
+export async function saveReceipts(receipts: Receipt[]) {
+    const database = await databasePromise;
+    const databaseTransaction = database.transaction("receipts", "readwrite");
+    await databaseTransaction.store.clear();
+    for (const receipt of receipts) {
+        await databaseTransaction.store.put(receipt);
+    }
+    await databaseTransaction.done;
+}
+
+// 【レシート商品明細の読み込み・保存】
+export async function loadReceiptItems() {
+    const database = await databasePromise;
+    return database.getAll("receiptItems");
+}
+
+export async function saveReceiptItems(items: ReceiptItem[]) {
+    const database = await databasePromise;
+    const databaseTransaction = database.transaction("receiptItems", "readwrite");
+    await databaseTransaction.store.clear();
+    for (const item of items) {
+        await databaseTransaction.store.put(item);
+    }
+    await databaseTransaction.done;
 }
 
 // 【ウォレット設定と資金移動】
