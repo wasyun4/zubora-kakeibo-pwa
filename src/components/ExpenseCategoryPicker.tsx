@@ -50,8 +50,8 @@ function ExpenseCategoryPicker({
         aria-haspopup="dialog"
         onClick={openPicker}
       >
-        <span>{selectedMajor && selectedMinor
-          ? `${selectedMajor.name} / ${selectedMinor.name}`
+        <span>{selectedMajor
+          ? selectedMinor ? `${selectedMajor.name} / ${selectedMinor.name}` : selectedMajor.name
           : "選択してください"}</span>
         <span aria-hidden="true">⌄</span>
       </button>
@@ -82,8 +82,14 @@ function ExpenseCategoryPicker({
                     key={category.id}
                     type="button"
                     onClick={() => {
-                      setPendingMajorId(category.id);
-                      setStep("minor");
+                      const children = minorCategories.filter((minor) => minor.parentId === category.id);
+                      if (children.length === 0) {
+                        onChange(category.id, "");
+                        closePicker();
+                      } else {
+                        setPendingMajorId(category.id);
+                        setStep("minor");
+                      }
                     }}
                   >
                     {category.name}

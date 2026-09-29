@@ -102,7 +102,6 @@ export const initialCategories: Category[] = [
         parentId: null,
         isActive: true,
     },
-
     // 固定費 小カテゴリ
     {
         id: "housing",

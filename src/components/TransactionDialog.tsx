@@ -3,9 +3,10 @@ import { useEffect, useRef, type ReactNode } from "react";
 type TransactionDialogProps = {
   children: ReactNode;
   onCancel: () => void;
+  className?: string;
 };
 
-export default function TransactionDialog({ children, onCancel }: TransactionDialogProps) {
+export default function TransactionDialog({ children, onCancel, className = "" }: TransactionDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function TransactionDialog({ children, onCancel }: TransactionDia
   return (
     <dialog
       ref={dialogRef}
-      className="transaction-dialog"
+      className={`transaction-dialog ${className}`.trim()}
       aria-labelledby="transaction-form-title"
       onCancel={(event) => {
         event.preventDefault();

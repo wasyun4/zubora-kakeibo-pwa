@@ -243,9 +243,15 @@ export async function loadCategories(): Promise<Category[]> {
 
     try {
         const parsed: unknown = JSON.parse(saved);
-        return isCategoryArray(parsed)
-            ? parsed
-            : initialCategories.map((category) => ({ ...category }));
+        if (!isCategoryArray(parsed)) return initialCategories.map((category) => ({ ...category }));
+        const supported = parsed.filter((category) => category.id !== "consumptionTax");
+        const savedIds = new Set(supported.map((category) => category.id));
+        return [
+            ...supported,
+            ...initialCategories
+                .filter((category) => !savedIds.has(category.id))
+                .map((category) => ({ ...category })),
+        ];
     } catch {
         return initialCategories.map((category) => ({ ...category }));
     }

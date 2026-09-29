@@ -15,8 +15,8 @@ export default function EntryMenu({ onTransaction, onReceipt, onCancel }: EntryM
         <button type="button" className="entry-close" aria-label="入力方法を閉じる" onClick={onCancel}>×</button>
       </div>
       <div className="entry-menu-options">
-        <button type="button" onClick={onTransaction}>収支・振替を入力</button>
-        <button type="button" onClick={onReceipt}>レシートを入力</button>
+        <button type="button" onClick={onTransaction}>シンプル入力</button>
+        <button type="button" onClick={onReceipt}>レシート手入力</button>
       </div>
     </section>
   );

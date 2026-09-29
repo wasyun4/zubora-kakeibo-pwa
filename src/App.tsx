@@ -42,6 +42,7 @@ import CategorySettings from "./components/CategorySettings";
 import EntryMenu from "./components/EntryMenu";
 import ReceiptForm from "./components/ReceiptForm";
 import { calculateMonthlyBudget } from "./utils/budgets";
+import { allocateExternalTax } from "./utils/receipts";
 import {
   downloadBackup,
   restoreBackup,
@@ -286,6 +287,19 @@ function App() {
   const realizedReceiptItems = receiptItems.filter((item) => realizedReceiptIds.has(item.receiptId));
   const scheduledReceiptItems = receiptItems.filter((item) => scheduledReceiptIds.has(item.receiptId));
   const filteredReceiptItems = receiptItems.filter((item) => filteredReceiptIds.has(item.receiptId));
+  function allocateReceiptItems(selectedReceipts: Receipt[], selectedItems: ReceiptItem[]) {
+    return selectedReceipts.flatMap((receipt) => {
+      const items = selectedItems.filter((item) => item.receiptId === receipt.id);
+      const allocations = allocateExternalTax(items, receipt.externalTaxAmount ?? 0);
+      return items.map((item) => ({
+        ...item,
+        totalAmount: allocations.find((allocation) => allocation.itemId === item.id)?.totalAmount ?? item.amount * item.quantity,
+      }));
+    });
+  }
+  const realizedAllocatedItems = allocateReceiptItems(realizedReceipts, realizedReceiptItems);
+  const scheduledAllocatedItems = allocateReceiptItems(scheduledReceipts, scheduledReceiptItems);
+  const filteredAllocatedItems = allocateReceiptItems(filteredReceipts, filteredReceiptItems);
 
   // 【生活支出合計の計算】
   const expenseTotal = realizedExpenses
@@ -297,9 +311,9 @@ function App() {
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
-    ) + realizedReceiptItems
+    ) + realizedAllocatedItems
       .filter((item) => item.majorCategoryId !== "savings")
-      .reduce((sum, item) => sum + item.amount, 0);
+      .reduce((sum, item) => sum + item.totalAmount, 0);
 
   // 【貯金合計の計算】
   const savingsTotal = filteredExpenses
@@ -311,9 +325,9 @@ function App() {
     .reduce(
       (sum, expense) => sum + Number(expense.amount),
       0,
-    ) + filteredReceiptItems
+    ) + filteredAllocatedItems
       .filter((item) => item.majorCategoryId === "savings")
-      .reduce((sum, item) => sum + item.amount, 0);
+      .reduce((sum, item) => sum + item.totalAmount, 0);
 
   // 【収入合計の計算】
   const incomeTotal = realizedExpenses
@@ -326,9 +340,9 @@ function App() {
   const scheduledPaymentTotal = scheduledExpenses.reduce(
     (sum, expense) => sum + Number(expense.amount),
     0,
-  ) + scheduledReceiptItems
+  ) + scheduledAllocatedItems
     .filter((item) => item.majorCategoryId !== "savings")
-    .reduce((sum, item) => sum + item.amount, 0);
+    .reduce((sum, item) => sum + item.totalAmount, 0);
 
   // 【大カテゴリ別支出合計の計算】
   const expenseCategoryTotals = expenseMajorCategories
@@ -343,9 +357,9 @@ function App() {
         .reduce(
           (sum, expense) => sum + Number(expense.amount),
           0,
-        ) + realizedReceiptItems
+        ) + realizedAllocatedItems
           .filter((item) => item.majorCategoryId === category.id)
-          .reduce((sum, item) => sum + item.amount, 0);
+          .reduce((sum, item) => sum + item.totalAmount, 0);
 
       return {
         id: category.id,
@@ -367,9 +381,9 @@ function App() {
             expense.majorCategoryId === category.id,
         )
         .reduce((sum, expense) => sum + Number(expense.amount), 0) +
-        filteredReceiptItems
+        filteredAllocatedItems
           .filter((item) => item.majorCategoryId === category.id)
-          .reduce((sum, item) => sum + item.amount, 0),
+          .reduce((sum, item) => sum + item.totalAmount, 0),
     }));
 
   // 【カテゴリ別の支出実績と予算を結合】
@@ -634,9 +648,12 @@ function App() {
 
     if (
       type === "expense" &&
-      (majorCategoryId === "" || minorCategoryId === "")
+      (majorCategoryId === "" || (
+        expenseMinorCategories.some((category) => category.parentId === majorCategoryId) &&
+        minorCategoryId === ""
+      ))
     ) {
-      alert("支出の大カテゴリと小カテゴリを選択してください。");
+      alert("支出カテゴリを選択してください。");
       return;
     }
 
@@ -847,7 +864,7 @@ function App() {
       </button>
 
       {isEntryMenuOpen && (
-        <TransactionDialog onCancel={() => setIsEntryMenuOpen(false)}>
+        <TransactionDialog className="entry-menu-dialog" onCancel={() => setIsEntryMenuOpen(false)}>
           <EntryMenu
             onTransaction={() => {
               setIsEntryMenuOpen(false);

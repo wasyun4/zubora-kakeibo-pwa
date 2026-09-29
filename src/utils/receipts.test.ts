@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Receipt, ReceiptItem } from "../types";
 import {
   calculateReceiptItemsTotal,
+  calculateReceiptTotal,
+  allocateExternalTax,
   getReceiptValidationError,
 } from "./receipts";
 
@@ -30,7 +32,7 @@ const items: ReceiptItem[] = [
     receiptId: receipt.id,
     name: "飲み物",
     quantity: 2,
-    amount: 300,
+    amount: 150,
     majorCategoryId: "food",
     minorCategoryId: "beverages",
   },
@@ -39,6 +41,16 @@ const items: ReceiptItem[] = [
 describe("receipt calculations", () => {
   it("calculates the item total", () => {
     expect(calculateReceiptItemsTotal(items)).toBe(500);
+  });
+
+  it("adds external tax to the receipt total", () => {
+    expect(calculateReceiptTotal(items, 45)).toBe(545);
+  });
+
+  it("allocates external tax by item amount and gives the remainder to the last item", () => {
+    const allocated = allocateExternalTax(items, 101);
+    expect(allocated.map((item) => item.totalAmount)).toEqual([240, 361]);
+    expect(allocated.reduce((sum, item) => sum + item.totalAmount, 0)).toBe(601);
   });
 
   it("accepts a valid receipt", () => {

@@ -93,7 +93,10 @@ export default function TransactionList({ transactions, transfers, receipts, rec
               <p className="transaction-date"><time dateTime={item.receipt.date}>{item.receipt.date}</time></p>
               <div className="transaction-overview"><div><span className="transaction-type receipt-type">レシート</span><strong className="transaction-category">{item.receipt.storeName}</strong></div><strong className="transaction-amount expense-amount">－{formatCurrency(item.receipt.totalAmount)}</strong></div>
               <div className="transaction-details"><span>{getPaymentMethodName(item.receipt.paymentMethodId)}</span><span>{item.receipt.scope === "shared" ? "共有" : "個人"}</span><span>{items.length}商品</span><span>{isOpen ? "明細を閉じる ▲" : "明細を見る ▼"}</span></div>
-              {isOpen && <ul className="receipt-history-details">{items.map((receiptItem) => <li key={receiptItem.id}><span>{receiptItem.name}<small>{getCategoryName(receiptItem.minorCategoryId || receiptItem.majorCategoryId)}</small></span><strong>{formatCurrency(receiptItem.amount)}</strong></li>)}</ul>}
+              {isOpen && <ul className="receipt-history-details">
+                {items.map((receiptItem) => <li key={receiptItem.id}><span>{receiptItem.name}<small>{getCategoryName(receiptItem.minorCategoryId || receiptItem.majorCategoryId)}・{receiptItem.quantity}個</small></span><strong>{formatCurrency(receiptItem.amount * receiptItem.quantity)}</strong></li>)}
+                {(item.receipt.externalTaxAmount ?? 0) > 0 && <li><span>外税<small>レシート全体</small></span><strong>{formatCurrency(item.receipt.externalTaxAmount ?? 0)}</strong></li>}
+              </ul>}
             </li>
           );
         })}

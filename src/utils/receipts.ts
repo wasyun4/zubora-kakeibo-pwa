@@ -4,7 +4,30 @@
 import type { Receipt, ReceiptItem } from "../types";
 
 export function calculateReceiptItemsTotal(items: ReceiptItem[]) {
-  return items.reduce((total, item) => total + item.amount, 0);
+  return items.reduce((total, item) => total + item.amount * item.quantity, 0);
+}
+
+export function calculateReceiptTotal(items: ReceiptItem[], externalTaxAmount: number) {
+  return calculateReceiptItemsTotal(items) + externalTaxAmount;
+}
+
+export function allocateExternalTax(items: ReceiptItem[], externalTaxAmount: number) {
+  const subtotal = calculateReceiptItemsTotal(items);
+  let allocatedTax = 0;
+
+  return items.map((item, index) => {
+    const netAmount = item.amount * item.quantity;
+    const taxAmount = index === items.length - 1
+      ? externalTaxAmount - allocatedTax
+      : Math.floor(externalTaxAmount * netAmount / subtotal);
+    allocatedTax += taxAmount;
+    return {
+      itemId: item.id,
+      netAmount,
+      taxAmount,
+      totalAmount: netAmount + taxAmount,
+    };
+  });
 }
 
 export function getReceiptValidationError(
@@ -29,7 +52,11 @@ export function getReceiptValidationError(
   if (items.some((item) => !Number.isFinite(item.amount) || item.amount <= 0)) {
     return "商品金額は1円以上で入力してください。";
   }
-  if (calculateReceiptItemsTotal(items) !== receipt.totalAmount) {
+  const externalTaxAmount = receipt.externalTaxAmount ?? 0;
+  if (!Number.isFinite(externalTaxAmount) || externalTaxAmount < 0) {
+    return "外税は0円以上で入力してください。";
+  }
+  if (calculateReceiptTotal(items, externalTaxAmount) !== receipt.totalAmount) {
     return "商品明細の合計とレシート合計が一致していません。";
   }
 

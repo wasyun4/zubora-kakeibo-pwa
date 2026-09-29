@@ -53,6 +53,7 @@ export type Receipt = {
   date: string;
   storeName: string;
   totalAmount: number;
+  externalTaxAmount?: number;
   paymentMethodId: string;
   scope: TransactionScope;
   memo: string;
